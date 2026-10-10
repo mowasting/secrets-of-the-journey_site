@@ -1,45 +1,112 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
     <title>Secrets Of The Journey Sessions</title>
-
     <link rel="stylesheet" href="style.css">
 </head>
-
 <body>
 
-    <main class="login-page">
+<header class="topbar">
+    <button id="menuBtn" class="menu-btn" aria-label="Menu" hidden>
+        <span></span><span></span><span></span>
+    </button>
+    <div class="brand">
+        <img class="logo-sm" src="logo.jpg" alt="">
+        <span class="brand-name">Secrets Of The Journey</span>
+    </div>
+    <div class="top-actions">
+        <select id="langSelect" aria-label="Language">
+            <option value="ar">العربية</option>
+            <option value="en">English</option>
+            <option value="ckb">کوردی</option>
+        </select>
+        <label class="theme-toggle" title="Theme">
+            <input type="checkbox" id="themeToggle">
+            <span class="tt-track">
+                <span class="tt-stars"></span>
+                <span class="tt-clouds"></span>
+            </span>
+            <span class="tt-knob"></span>
+        </label>
+    </div>
+</header>
 
-        <section class="login-card">
+<!-- شاشة تسجيل الدخول -->
+<main id="loginView" class="login-page">
+    <section class="login-card">
+        <img class="logo" src="logo.jpg" alt="">
+        <h1 data-i18n="welcome"></h1>
+        <p class="subtitle" data-i18n="subtitle"></p>
+        <button id="telegramLogin" class="telegram-button">
+            <span class="telegram-icon">➤</span>
+            <span data-i18n="continue"></span>
+        </button>
+        <p class="login-note" data-i18n="loginNote"></p>
+    </section>
+</main>
 
-            <div class="logo">
-                SJ
+<!-- الموقع بعد الدخول -->
+<main id="appView" class="app" hidden>
+
+    <section id="liveView">
+        <div class="card me-card">
+            <div id="meAvatarBox"></div>
+            <div>
+                <div class="muted" data-i18n="hello"></div>
+                <div id="meName" class="me-name"></div>
             </div>
+        </div>
+        <div class="card status-card">
+            <div id="statusLabel" class="status-label"></div>
+            <div id="countdown" class="countdown">--:--:--</div>
+            <button id="joinBtn" class="primary" data-i18n="join"></button>
+            <div id="joinedInfo" class="muted"></div>
+        </div>
+        <div class="card">
+            <h3 data-i18n="top5"></h3>
+            <ul id="top5" class="rank-list"></ul>
+        </div>
+    </section>
 
-            <h1>Welcome back</h1>
+    <section id="rankView" hidden>
+        <div class="card">
+            <h3 data-i18n="rankTitle"></h3>
+            <ul id="rankList" class="rank-list"></ul>
+        </div>
+    </section>
 
-            <p class="subtitle">
-                Sign in to continue your study journey.
-            </p>
+    <section id="accountView" hidden>
+        <div class="card">
+            <div class="acc-head">
+                <div id="accAvatarBox"></div>
+                <div id="accName" class="me-name"></div>
+                <div id="accUser" class="muted"></div>
+            </div>
+            <div class="stat"><span data-i18n="statHours"></span><b id="accHours">-</b></div>
+            <div class="stat"><span data-i18n="statRank"></span><b id="accRank">-</b></div>
+            <div class="stat"><span data-i18n="statSessions"></span><b id="accSessions">-</b></div>
+        </div>
+    </section>
+</main>
 
-            <button id="telegramLogin" class="telegram-button">
-                <span class="telegram-icon">➤</span>
-                Continue with Telegram
-            </button>
+<!-- القائمة الجانبية -->
+<div id="overlay" class="overlay"></div>
+<aside id="drawer" class="drawer">
+    <div class="drawer-head">
+        <div id="drawerAvatarBox"></div>
+        <div id="drawerName" class="me-name"></div>
+    </div>
+    <button class="drawer-item active" data-view="live" data-i18n="navLive"></button>
+    <button class="drawer-item" data-view="rank" data-i18n="navRank"></button>
+    <button class="drawer-item" data-view="account" data-i18n="navAccount"></button>
+    <a id="adminLink" href="admin.html" class="drawer-item" hidden data-i18n="navAdmin"></a>
+    <button id="logoutBtn" class="drawer-item danger" data-i18n="logout"></button>
+</aside>
 
-            <p class="login-note">
-                Your Telegram account will be used to securely verify your identity.
-            </p>
-
-        </section>
-
-    </main>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="supabase.js"></script>
 <script src="script.js"></script>
-
 </body>
 </html>

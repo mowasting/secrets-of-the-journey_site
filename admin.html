@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>لوحة الأدمن</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+  body{font-family:Tahoma,sans-serif;max-width:520px;margin:20px auto;padding:0 14px;background:#111;color:#eee}
+  h1{font-size:20px} label{display:block;margin:12px 0 4px}
+  input[type=number]{width:100%;padding:8px;border-radius:6px;border:1px solid #444;background:#1c1c1c;color:#eee}
+  button{margin-top:12px;padding:10px 14px;border:0;border-radius:6px;background:#3b82f6;color:#fff;cursor:pointer;width:100%}
+  button.red{background:#dc2626} .box{background:#1c1c1c;padding:14px;border-radius:10px;margin-top:16px}
+  .row{display:flex;gap:10px;align-items:center} #msg{margin-top:10px;color:#fbbf24}
+  li{margin:4px 0;font-size:14px}
+</style>
+</head>
+<body>
+<h1>لوحة تحكم الأدمن</h1>
+<div id="msg"></div>
+<div id="panel" style="display:none">
+  <div class="box">
+    <label>مدة السشن (دقيقة)</label><input type="number" id="session_minutes" min="1">
+    <label>الراحة تبدأ بعد كم دقيقة من بداية السشن</label><input type="number" id="break_after_minutes" min="0">
+    <label>مدة الراحة (دقيقة، 0 = بدون راحة)</label><input type="number" id="break_minutes" min="0">
+    <label>الفاصل بين السشنات (دقيقة)</label><input type="number" id="gap_minutes" min="0">
+    <div class="row"><input type="checkbox" id="auto_run"><label style="margin:0">تشغيل تلقائي (السشنات تستمر لحد ما أطفيها)</label></div>
+    <button onclick="saveSettings()">حفظ الإعدادات</button>
+  </div>
+  <div class="box">
+    <label>عدد السشنات اللي تنشأ الآن</label><input type="number" id="count" value="1" min="1" max="50">
+    <button onclick="createSessions()">إنشاء السشنات</button>
+    <button class="red" onclick="stopAll()">إيقاف كل شي</button>
+  </div>
+  <div class="box"><b>آخر السشنات</b><ul id="list"></ul></div>
+</div>
+<script>
+const sb = window.supabase.createClient('https://souefqcmrghnmkxfveut.supabase.co', 'sb_publishable_I6yB9hn7Yx1-MLnndUjs6A_RZuFAh0M');
+const $ = id => document.getElementById(id);
+const msg = t => $('msg').textContent = t;
+const F = ['session_minutes','break_after_minutes','break_minutes','gap_minutes'];
+
+async function init(){
+  const {data:{session}} = await sb.auth.getSession();
+  if(!session){ msg('سجّل دخول من الموقع أول، بعدين ارجع لهالصفحة.'); return; }
+  const {data:ok} = await sb.rpc('sj_is_admin');
+  if(!ok){ msg('هذا الحساب مو أدمن.'); return; }
+  $('panel').style.display='block'; load();
+}
+async function load(){
+  const {data:s} = await sb.from('settings').select('*').eq('id',1).single();
+  F.forEach(k => $(k).value = s[k]); $('auto_run').checked = s.auto_run;
+  const {data:rows} = await sb.from('sessions').select('starts_at,ends_at').order('starts_at',{ascending:false}).limit(6);
+  $('list').innerHTML = (rows||[]).map(r => `<li>${new Date(r.starts_at).toLocaleString('ar-IQ')} ← ${new Date(r.ends_at).toLocaleTimeString('ar-IQ')}</li>`).join('');
+}
+async function saveSettings(){
+  const u = {auto_run:$('auto_run').checked}; F.forEach(k => u[k] = +$(k).value);
+  const {error} = await sb.from('settings').update(u).eq('id',1);
+  msg(error ? 'خطأ: '+error.message : 'انحفظت الإعدادات ✅');
+}
+async function createSessions(){
+  const {error} = await sb.rpc('admin_create_sessions',{n:+$('count').value});
+  msg(error ? 'خطأ: '+error.message : 'انشأت السشنات ✅'); load();
+}
+async function stopAll(){
+  if(!confirm('تأكد؟ ينهي السشن الحالي ويحذف القادم ويطفي التلقائي.')) return;
+  const {error} = await sb.rpc('admin_stop_all');
+  msg(error ? 'خطأ: '+error.message : 'انوقف كل شي ✅'); load();
+}
+init();
+</script>
+</body>
+</html>
