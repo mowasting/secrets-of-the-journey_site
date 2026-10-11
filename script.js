@@ -28,7 +28,11 @@ const I18N = {
     opening: "جارٍ فتح تيليجرام...", waiting: "بانتظار تيليجرام...",
     loginFailed: "فشل تسجيل الدخول أو انتهت المهلة. حاول مرة ثانية.",
     joinFailed: "تعذّر الانضمام. حاول مرة ثانية.", student: "طالب",
-  },
+    progressTitle: "تقدّمي", periodWeek: "أسبوعي", periodMonth: "شهري", progTotal: "المجموع",
+    progressTitle: "My progress", periodWeek: "Weekly", periodMonth: "Monthly", progTotal: "Total",
+    progressTitle: "پێشکەوتنم", periodWeek: "هەفتانە", periodMonth: "مانگانە", progTotal: "کۆی گشتی",
+
+   },
   en: {
     welcome: "Welcome back", subtitle: "Sign in to continue your study journey.",
     continue: "Continue with Telegram",
@@ -262,7 +266,58 @@ async function loadAccount() {
   const { count } = await supabaseClient
     .from("attendance").select("id", { count: "exact", head: true }).eq("user_id", me.id);
   $("accSessions").textContent = count || 0;
+  loadProgress();
 }
+
+/* ---------- مخطط التقدّم ---------- */
+let progressPeriod = "week";
+function chartLocale() {
+  return { ar: "ar-IQ", en: "en", ckb: "ckb" }[currentLanguage()] || "ar-IQ";
+}
+function dayLabel(dateStr, period) {
+  const d = new Date(dateStr + "T12:00:00");
+  if (period === "month") return String(d.getDate());
+  try { return d.toLocaleDateString(chartLocale(), { weekday: "short" }); }
+  catch (e) { return d.toLocaleDateString("ar-IQ", { weekday: "short" }); }
+}
+async function loadProgress() {
+  const period = progressPeriod;
+  const { data, error } = await supabaseClient.rpc("get_my_progress", { period });
+  if (error || !data) return;
+  const values = data.map((r) => Number(r.total_secs));
+  const max = Math.max(0, ...values);
+  const total = values.reduce((a, b) => a + b, 0);
+  $("progTotal").textContent = t("progTotal") + ": " + fmtHours(total);
+  const chart = $("progChart");
+  chart.replaceChildren();
+  chart.classList.toggle("month", period === "month");
+  data.forEach((r, i) => {
+    const secs = values[i];
+    const col = document.createElement("div");
+    col.className = "prog-col";
+    col.title = fmtHours(secs);
+    const track = document.createElement("div");
+    track.className = "prog-track";
+    const bar = document.createElement("div");
+    bar.className = "prog-bar";
+    bar.style.height = (max > 0 ? Math.max(3, (secs / max) * 100) : 3) + "%";
+    track.appendChild(bar);
+    const lab = document.createElement("div");
+    lab.className = "prog-label";
+    const show = period === "week" || i === 0 || (i + 1) % 5 === 0;
+    lab.textContent = show ? dayLabel(r.study_day, period) : "";
+    col.append(track, lab);
+    chart.appendChild(col);
+  });
+}
+function setPeriod(p) {
+  progressPeriod = p;
+  $("progWeek").classList.toggle("active", p === "week");
+  $("progMonth").classList.toggle("active", p === "month");
+  loadProgress();
+}
+$("progWeek").addEventListener("click", () => setPeriod("week"));
+$("progMonth").addEventListener("click", () => setPeriod("month"));
 
 /* ---------- القائمة الجانبية والتنقل ---------- */
 function openMenu() { $("drawer").classList.add("open"); $("overlay").classList.add("show"); }
@@ -276,8 +331,20 @@ function setView(name) {
   $("liveView").hidden = name !== "live";
   $("rankView").hidden = name !== "rank";
   $("accountView").hidden = name !== "account";
-  document.querySelectorAll(".drawer-item[data-view]").forEach((b) =>
+ /* ---------- التنقل (الشريط السفلي) ---------- */
+function setView(name) {
+  activeView = name;
+  $("liveView").hidden = name !== "live";
+  $("rankView").hidden = name !== "rank";
+  $("accountView").hidden = name !== "account";
+  document.querySelectorAll(".tab-item[data-view]").forEach((b) =>
     b.classList.toggle("active", b.dataset.view === name));
+  if (name === "rank") loadRank(null, $("rankList"));
+  if (name === "account") loadAccount();
+  window.scrollTo(0, 0);
+}
+document.querySelectorAll(".tab-item[data-view]").forEach((b) =>
+  b.addEventListener("click", () => setView(b.dataset.view)));
   if (name === "rank") loadRank(null, $("rankList"));
   if (name === "account") loadAccount();
   closeMenu();
@@ -309,12 +376,12 @@ async function enterApp() {
   const name = myName();
   $("meName").textContent = name;
   $("meAvatarBox").replaceChildren(makeAvatar(myProfile && myProfile.avatar_path, name));
-  $("drawerName").textContent = name;
-  $("drawerAvatarBox").replaceChildren(makeAvatar(myProfile && myProfile.avatar_path, name));
+    $("tabAvatarBox").replaceChildren(makeAvatar(myProfile && myProfile.avatar_path, name));
+  
 
   $("loginView").hidden = true;
   $("appView").hidden = false;
-  $("menuBtn").hidden = false;
+  $("tabbar").hidden = false;
 
   const { data: isAdmin } = await supabaseClient.rpc("sj_is_admin");
   $("adminLink").hidden = !isAdmin;
