@@ -322,8 +322,8 @@ $("progMonth").addEventListener("click", () => setPeriod("month"));
 /* ---------- القائمة الجانبية والتنقل ---------- */
 function openMenu() { $("drawer").classList.add("open"); $("overlay").classList.add("show"); }
 function closeMenu() { $("drawer").classList.remove("open"); $("overlay").classList.remove("show"); }
-$("menuBtn").addEventListener("click", openMenu);
-$("overlay").addEventListener("click", closeMenu);
+$("menuBtn")?.addEventListener("click", openMenu);
+$("overlay")?.addEventListener("click", closeMenu);
 document.addEventListener("keydown", (e) => { if (e.key === "Escape") closeMenu(); });
 
 function setView(name) {
