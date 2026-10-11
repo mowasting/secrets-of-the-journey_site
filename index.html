@@ -58,6 +58,7 @@
         <div class="card status-card">
             <div id="statusLabel" class="status-label"></div>
             <div id="countdown" class="countdown">--:--:--</div>
+            <div id="catScene" class="cat-scene"></div>
             <button id="joinBtn" class="primary" data-i18n="join"></button>
             <div id="joinedInfo" class="muted"></div>
         </div>
@@ -89,8 +90,6 @@
             <div class="stat"><span data-i18n="statRank"></span><b id="accRank">-</b></div>
             <div class="stat"><span data-i18n="statSessions"></span><b id="accSessions">-</b></div>
         </div>
-                    <div class="stat"><span data-i18n="statSessions"></span><b id="accSessions">-</b></div>
-        </div>
         <div class="card">
             <div class="card-head">
                 <h3 data-i18n="progressTitle"></h3>
@@ -102,63 +101,7 @@
             <div id="progTotal" class="muted"></div>
             <div id="progChart" class="prog-chart"></div>
         </div>
-                <div class="stat"><span data-i18n="statSessions"></span><b id="accSessions">-</b></div>
-        </div>
-        <div class="card">
-            <div class="card-head">
-                <h3 data-i18n="progressTitle"></h3>
-                <div class="seg">
-                    <button id="progWeek" class="seg-btn active" data-i18n="periodWeek"></button>
-                    <button id="progMonth" class="seg-btn" data-i18n="periodMonth"></button>
-                </div>
-            </div>
-            <div id="progTotal" class="muted"></div>
-            <div id="progChart" class="prog-chart"></div>
-        </div>
-                <div class="stat"><span data-i18n="statSessions"></span><b id="accSessions">-</b></div>
-        </div>
-        <div class="card">
-            <div class="card-head">
-                <h3 data-i18n="progressTitle"></h3>
-                <div class="seg">
-                    <button id="progWeek" class="seg-btn active" data-i18n="periodWeek"></button>
-                    <button id="progMonth" class="seg-btn" data-i18n="periodMonth"></button>
-                </div>
-            </div>
-            <div id="progTotal" class="muted"></div>
-            <div id="progChart" class="prog-chart"></div>
-        </div>
-         <div class="stat"><span data-i18n="statSessions"></span><b id="accSessions">-</b></div>
-        </div>
-        <div class="card">
-            <div class="card-head">
-                <h3 data-i18n="progressTitle"></h3>
-                <div class="seg">
-                    <button id="progWeek" class="seg-btn active" data-i18n="periodWeek"></button>
-                    <button id="progMonth" class="seg-btn" data-i18n="periodMonth"></button>
-                </div>
-            </div>
-            <div id="progTotal" class="muted"></div>
-            <div id="progChart" class="prog-chart"></div>
-        </div>
-        <div class="stat"><span data-i18n="statSessions"></span><b id="accSessions">-</b></div>
-    </div>
-    <div class="card"> 
-        <div class="card-head"> 
-             <h3 data-i18n="progressTitle"></h3>
-              <div class="seg">
-                    <button id="progWeek" class="seg-btn active" data-i18n="periodWeek"></button>
-                    <button id="progMonth" class="seg-btn" data-i18n="periodMonth"></button>
-              </div>
-              </div>
-            <div id="progTotal" class="muted"></div>
-            <div id="progChart" class="prog-chart"></div>
-        </div>
-    </div>
-     <div id="progTotal" class="muted"></div>
-     <div id="progChart" class="prog-chart"></div>
- </div>
- <button id="logoutBtn" class="logout-btn" data-i18n="logout"></button>
+        <button id="logoutBtn" class="logout-btn" data-i18n="logout"></button>
     </section>
 </main>
 
@@ -181,19 +124,10 @@
         <span data-i18n="navAccount"></span>
     </button>
 </nav>
-    <div class="drawer-head">
-        <div id="drawerAvatarBox"></div>
-        <div id="drawerName" class="me-name"></div>
-    </div>
-    <button class="drawer-item active" data-view="live" data-i18n="navLive"></button>
-    <button class="drawer-item" data-view="rank" data-i18n="navRank"></button>
-    <button class="drawer-item" data-view="account" data-i18n="navAccount"></button>
-    <a id="adminLink" href="admin.html" class="drawer-item" hidden data-i18n="navAdmin"></a>
-    <button id="logoutBtn" class="drawer-item danger" data-i18n="logout"></button>
-</aside>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="supabase.js"></script>
+<script src="cat.js"></script>
 <script src="script.js"></script>
 </body>
 </html>

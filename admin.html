@@ -21,9 +21,9 @@
 <div id="msg"></div>
 <div id="panel" style="display:none">
   <div class="box">
-    <label>مدة السشن الكلية (دقيقة)</label><input type="number" id="session_minutes" min="1">
-    <label>مدة الراحة بنهاية السشن (دقيقة، 0 = بدون راحة)</label><input type="number" id="break_minutes" min="0">
-    <div class="hint">السشن يبدأ بوقت الدراسة دائماً، والراحة تجي بآخره (داخل المدة الكلية). مثال: سشن 60 وراحة 10 = دراسة 50 دقيقة ثم راحة 10 دقائق، وبعدها يبدأ السشن التالي مباشرة.</div>
+    <label>مدة الدراسة (دقيقة)</label><input type="number" id="session_minutes" min="1">
+    <label>مدة الراحة بعد الدراسة (دقيقة، 0 = بدون راحة)</label><input type="number" id="break_minutes" min="0">
+    <div class="hint">الدراسة والراحة منفصلتين: تبدأ الدراسة كاملة، وبعد ما تخلص تبدأ الراحة، وبعدها دراسة جديدة وهكذا. مثال: دراسة 90 وراحة 15 = 90 دقيقة دراسة كاملة ثم 15 دقيقة راحة ثم تبدأ دراسة جديدة.</div>
     <div class="row" style="margin-top:12px"><input type="checkbox" id="auto_run"><label style="margin:0">تشغيل تلقائي (السشنات تستمر لحد ما أطفيها)</label></div>
     <button onclick="saveSettings()">حفظ الإعدادات</button>
   </div>
@@ -55,9 +55,9 @@ async function load(){
 }
 async function saveSettings(){
   const u = {auto_run:$('auto_run').checked}; F.forEach(k => u[k] = +$(k).value);
-  if(u.session_minutes < 1){ msg('مدة السشن لازم تكون دقيقة أو أكثر.'); return; }
-  if(u.break_minutes < 0 || u.break_minutes >= u.session_minutes){
-    msg('مدة الراحة لازم تكون أقل من مدة السشن (أو 0 بدون راحة).'); return;
+  if(u.session_minutes < 1){ msg('مدة الدراسة لازم تكون دقيقة أو أكثر.'); return; }
+  if(u.break_minutes < 0){
+    msg('مدة الراحة لازم تكون 0 أو أكثر.'); return;
   }
   const {error} = await sb.from('settings').update(u).eq('id',1);
   msg(error ? 'خطأ: '+error.message : 'انحفظت الإعدادات ✅ (تنطبق على السشنات الجديدة)');

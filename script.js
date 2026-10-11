@@ -10,6 +10,7 @@ let reloading = false;
 let tickTimer = null;
 let pollTimer = null;
 let activeView = "live";
+let catInit = false;
 
 /* ---------- اللغات ---------- */
 const I18N = {
@@ -29,10 +30,7 @@ const I18N = {
     loginFailed: "فشل تسجيل الدخول أو انتهت المهلة. حاول مرة ثانية.",
     joinFailed: "تعذّر الانضمام. حاول مرة ثانية.", student: "طالب",
     progressTitle: "تقدّمي", periodWeek: "أسبوعي", periodMonth: "شهري", progTotal: "المجموع",
-    progressTitle: "My progress", periodWeek: "Weekly", periodMonth: "Monthly", progTotal: "Total",
-    progressTitle: "پێشکەوتنم", periodWeek: "هەفتانە", periodMonth: "مانگانە", progTotal: "کۆی گشتی",
-
-   },
+  },
   en: {
     welcome: "Welcome back", subtitle: "Sign in to continue your study journey.",
     continue: "Continue with Telegram",
@@ -48,6 +46,7 @@ const I18N = {
     opening: "Opening Telegram...", waiting: "Waiting for Telegram...",
     loginFailed: "Login failed or expired. Please try again.",
     joinFailed: "Could not join. Please try again.", student: "Student",
+    progressTitle: "My progress", periodWeek: "Weekly", periodMonth: "Monthly", progTotal: "Total",
   },
   ckb: {
     welcome: "بەخێربێیتەوە", subtitle: "بچۆ ژوورەوە بۆ بەردەوامبوون لە گەشتی خوێندنەکەت.",
@@ -64,6 +63,7 @@ const I18N = {
     opening: "تێلێگرام دەکرێتەوە...", waiting: "چاوەڕێی تێلێگرام...",
     loginFailed: "چوونەژوورەوە سەرکەوتوو نەبوو یان کاتەکەی تەواو بوو. دووبارە هەوڵبدەرەوە.",
     joinFailed: "بەشداریکردن سەرکەوتوو نەبوو. دووبارە هەوڵبدەرەوە.", student: "خوێندکار",
+    progressTitle: "پێشکەوتنم", periodWeek: "هەفتانە", periodMonth: "مانگانە", progTotal: "کۆی گشتی",
   },
 };
 
@@ -174,7 +174,7 @@ async function loadSession() {
 function renderStatus() {
   const s = currentSession;
   const now = Date.now();
-  let label = t("noSession"), target = null, canJoin = false;
+  let label = t("noSession"), target = null, canJoin = false, phase = "study";
 
   if (s) {
     const st = +new Date(s.starts_at), en = +new Date(s.ends_at);
@@ -186,7 +186,7 @@ function renderStatus() {
       label = t("startsIn"); target = st;
     } else if (bs && be && now >= bs && now < be) {
       // وقت الراحة (بنهاية السشن): العد التنازلي لحد ما تخلص الراحة
-      label = t("breakEndsIn"); target = be; canJoin = false;
+      label = t("breakEndsIn"); target = be; canJoin = false; phase = "break";
     } else if (bs && be) {
       // وقت الدراسة: العد التنازلي لحد ما تبدأ الراحة
       label = t("studyEndsIn"); target = bs; canJoin = true;
@@ -194,6 +194,8 @@ function renderStatus() {
       label = t("endsIn"); target = en; canJoin = true;
     }
   }
+
+  if (window.SJCat) { SJCat.set(phase, !catInit); catInit = true; }
 
   $("statusLabel").textContent = label;
   $("countdown").textContent = target ? fmtClock(target - now) : "--:--:--";
@@ -319,19 +321,7 @@ function setPeriod(p) {
 $("progWeek").addEventListener("click", () => setPeriod("week"));
 $("progMonth").addEventListener("click", () => setPeriod("month"));
 
-/* ---------- القائمة الجانبية والتنقل ---------- */
-function openMenu() { $("drawer").classList.add("open"); $("overlay").classList.add("show"); }
-function closeMenu() { $("drawer").classList.remove("open"); $("overlay").classList.remove("show"); }
-$("menuBtn")?.addEventListener("click", openMenu);
-$("overlay")?.addEventListener("click", closeMenu);
-document.addEventListener("keydown", (e) => { if (e.key === "Escape") closeMenu(); });
-
-function setView(name) {
-  activeView = name;
-  $("liveView").hidden = name !== "live";
-  $("rankView").hidden = name !== "rank";
-  $("accountView").hidden = name !== "account";
- /* ---------- التنقل (الشريط السفلي) ---------- */
+/* ---------- التنقل (الشريط السفلي) ---------- */
 function setView(name) {
   activeView = name;
   $("liveView").hidden = name !== "live";
@@ -344,12 +334,6 @@ function setView(name) {
   window.scrollTo(0, 0);
 }
 document.querySelectorAll(".tab-item[data-view]").forEach((b) =>
-  b.addEventListener("click", () => setView(b.dataset.view)));
-  if (name === "rank") loadRank(null, $("rankList"));
-  if (name === "account") loadAccount();
-  closeMenu();
-}
-document.querySelectorAll(".drawer-item[data-view]").forEach((b) =>
   b.addEventListener("click", () => setView(b.dataset.view)));
 
 $("logoutBtn").addEventListener("click", async () => {
