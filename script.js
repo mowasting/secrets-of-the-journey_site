@@ -19,9 +19,11 @@ const I18N = {
     loginNote: "سيُستخدم حساب تيليجرام الخاص بك للتحقق من هويتك بشكل آمن.",
     navLive: "السشن المباشر", navRank: "الترتيب", navAccount: "حسابي", navAdmin: "لوحة الأدمن", logout: "تسجيل الخروج",
     hello: "أهلاً", noSession: "ما في سشن حالياً", startsIn: "السشن القادم يبدأ بعد",
-    endsIn: "السشن ينتهي بعد", breakEndsIn: "الراحة تنتهي بعد",
+    endsIn: "السشن ينتهي بعد", studyEndsIn: "وقت الدراسة ينتهي بعد", breakEndsIn: "الراحة تنتهي بعد",
     join: "انضمام للسشن", joined: "تم انضمامك ✅", joinedAt: "انضممت الساعة",
-    top5: "أفضل 5 بساعات الدراسة", rankTitle: "الترتيب العام", hoursUnit: "س",
+    top5: "أفضل 5 هذا الأسبوع", top5Empty: "لا أحد درس هذا الأسبوع بعد، كن الأول!",
+    rankTitle: "الترتيب العام", hoursUnit: "س",
+    hUnit: "ساعة", mUnit: "دقيقة", and: "و",
     statHours: "مجموع ساعات الدراسة", statRank: "ترتيبي", statSessions: "السشنات التي حضرتها",
     opening: "جارٍ فتح تيليجرام...", waiting: "بانتظار تيليجرام...",
     loginFailed: "فشل تسجيل الدخول أو انتهت المهلة. حاول مرة ثانية.",
@@ -33,9 +35,11 @@ const I18N = {
     loginNote: "Your Telegram account will be used to securely verify your identity.",
     navLive: "Live Session", navRank: "Rank", navAccount: "Account", navAdmin: "Admin", logout: "Log out",
     hello: "Hello", noSession: "No session right now", startsIn: "Next session starts in",
-    endsIn: "Session ends in", breakEndsIn: "Break ends in",
+    endsIn: "Session ends in", studyEndsIn: "Study time ends in", breakEndsIn: "Break ends in",
     join: "Join session", joined: "You joined ✅", joinedAt: "Joined at",
-    top5: "Top 5 by study hours", rankTitle: "Overall ranking", hoursUnit: "h",
+    top5: "Top 5 this week", top5Empty: "No one has studied this week yet. Be the first!",
+    rankTitle: "Overall ranking", hoursUnit: "h",
+    hUnit: "h", mUnit: "min", and: "",
     statHours: "Total study hours", statRank: "My rank", statSessions: "Sessions attended",
     opening: "Opening Telegram...", waiting: "Waiting for Telegram...",
     loginFailed: "Login failed or expired. Please try again.",
@@ -47,9 +51,11 @@ const I18N = {
     loginNote: "ئەکاونتی تێلێگرامەکەت بۆ سەلماندنی ناسنامەکەت بە شێوەیەکی سەلامەت بەکاردێت.",
     navLive: "سیشنی ڕاستەوخۆ", navRank: "ڕیزبەندی", navAccount: "هەژمارەکەم", navAdmin: "بەڕێوەبەر", logout: "چوونەدەرەوە",
     hello: "سڵاو", noSession: "ئێستا هیچ سیشنێک نییە", startsIn: "سیشنی داهاتوو دەست پێدەکات دوای",
-    endsIn: "سیشن کۆتایی دێت دوای", breakEndsIn: "پشوو کۆتایی دێت دوای",
+    endsIn: "سیشن کۆتایی دێت دوای", studyEndsIn: "کاتی خوێندن کۆتایی دێت دوای", breakEndsIn: "پشوو کۆتایی دێت دوای",
     join: "بەشداربوون", joined: "بەشداریت کردووە ✅", joinedAt: "کاتی بەشداربوون",
-    top5: "باشترین ٥ کەس بە کاتژمێری خوێندن", rankTitle: "ڕیزبەندی گشتی", hoursUnit: "کاتژمێر",
+    top5: "باشترین ٥ ئەم هەفتەیە", top5Empty: "هێشتا کەس ئەم هەفتەیە نەخوێندووە. یەکەم کەس بە!",
+    rankTitle: "ڕیزبەندی گشتی", hoursUnit: "کاتژمێر",
+    hUnit: "کاتژمێر", mUnit: "خولەک", and: "و",
     statHours: "کۆی کاتژمێرەکانی خوێندن", statRank: "ڕیزبەندیم", statSessions: "ئەو سیشنانەی ئامادەبووم",
     opening: "تێلێگرام دەکرێتەوە...", waiting: "چاوەڕێی تێلێگرام...",
     loginFailed: "چوونەژوورەوە سەرکەوتوو نەبوو یان کاتەکەی تەواو بوو. دووبارە هەوڵبدەرەوە.",
@@ -73,7 +79,7 @@ function applyLang() {
   $("langSelect").value = l;
   if (me) {
     renderStatus();
-    loadRank(5, $("top5"));
+    loadTop5();
     if (activeView === "rank") loadRank(null, $("rankList"));
     if (activeView === "account") loadAccount();
   }
@@ -123,9 +129,22 @@ function fmtClock(ms) {
   const s = Math.max(0, Math.floor(ms / 1000));
   return pad(Math.floor(s / 3600)) + ":" + pad(Math.floor((s % 3600) / 60)) + ":" + pad(s % 60);
 }
+/* مدة الدراسة بالساعات والدقائق: "1 ساعة و 12 دقيقة" (بدون أرقام عشرية) */
 function fmtHours(secs) {
-  const s = Number(secs) || 0;
-  return Math.floor(s / 3600) + ":" + pad(Math.floor((s % 3600) / 60));
+  const totalMin = Math.floor((Number(secs) || 0) / 60);
+  const h = Math.floor(totalMin / 60);
+  const m = totalMin % 60;
+  const parts = [];
+  if (h > 0) parts.push(h + " " + t("hUnit"));
+  if (m > 0 || h === 0) parts.push(m + " " + t("mUnit"));
+  const glue = t("and") ? " " + t("and") + " " : " ";
+  return parts.join(glue);
+}
+
+/* ---------- الساعة الحقيقية ---------- */
+function updateClock() {
+  const el = $("clock");
+  if (el) el.textContent = new Date().toLocaleTimeString("en-GB", { hour12: false });
 }
 
 /* ---------- السشن المباشر ---------- */
@@ -162,7 +181,11 @@ function renderStatus() {
     } else if (now < st) {
       label = t("startsIn"); target = st;
     } else if (bs && be && now >= bs && now < be) {
-      label = t("breakEndsIn"); target = be; canJoin = true;
+      // وقت الراحة (بنهاية السشن): العد التنازلي لحد ما تخلص الراحة
+      label = t("breakEndsIn"); target = be; canJoin = false;
+    } else if (bs && be) {
+      // وقت الدراسة: العد التنازلي لحد ما تبدأ الراحة
+      label = t("studyEndsIn"); target = bs; canJoin = true;
     } else {
       label = t("endsIn"); target = en; canJoin = true;
     }
@@ -189,7 +212,7 @@ $("joinBtn").addEventListener("click", async () => {
   const { error } = await supabaseClient.rpc("join_current_session");
   if (error) alert(t("joinFailed"));
   await loadSession();
-  loadRank(5, $("top5"));
+  loadTop5();
 });
 
 /* ---------- الترتيب ---------- */
@@ -197,7 +220,8 @@ function renderRank(el, rows) {
   el.replaceChildren();
   rows.forEach((r) => {
     const li = document.createElement("li");
-    if (me && r.user_id === me.id) li.className = "me";
+    if (me && r.user_id === me.id) li.classList.add("me");
+    if (Number(r.rank_no) <= 3) li.classList.add("rank-" + r.rank_no);
     const pos = document.createElement("span");
     pos.className = "pos";
     pos.textContent = r.rank_no;
@@ -206,7 +230,7 @@ function renderRank(el, rows) {
     name.textContent = r.display_name;
     const hrs = document.createElement("span");
     hrs.className = "hrs";
-    hrs.textContent = fmtHours(r.study_seconds) + " " + t("hoursUnit");
+    hrs.textContent = fmtHours(r.study_seconds);
     li.append(pos, makeAvatar(r.avatar_path, r.display_name), name, hrs);
     el.appendChild(li);
   });
@@ -214,6 +238,13 @@ function renderRank(el, rows) {
 async function loadRank(limit, el) {
   const { data, error } = await supabaseClient.rpc("get_rank", limit ? { limit_count: limit } : {});
   if (!error && data) renderRank(el, data);
+}
+/* أعلى 5 للأسبوع الحالي */
+async function loadTop5() {
+  const { data, error } = await supabaseClient.rpc("get_week_rank", { limit_count: 5 });
+  if (error || !data) return;
+  renderRank($("top5"), data);
+  $("top5Empty").hidden = data.length > 0;
 }
 
 /* ---------- صفحة الحساب ---------- */
@@ -225,7 +256,7 @@ async function loadAccount() {
 
   const { data } = await supabaseClient.rpc("get_rank", {});
   const row = (data || []).find((r) => r.user_id === me.id);
-  $("accHours").textContent = fmtHours(row ? row.study_seconds : 0) + " " + t("hoursUnit");
+  $("accHours").textContent = fmtHours(row ? row.study_seconds : 0);
   $("accRank").textContent = row ? "#" + row.rank_no : "-";
 
   const { count } = await supabaseClient
@@ -288,14 +319,15 @@ async function enterApp() {
   const { data: isAdmin } = await supabaseClient.rpc("sj_is_admin");
   $("adminLink").hidden = !isAdmin;
 
-  await Promise.all([loadSession(), loadRank(5, $("top5"))]);
+  await Promise.all([loadSession(), loadTop5()]);
 
   clearInterval(tickTimer);
   clearInterval(pollTimer);
-  tickTimer = setInterval(renderStatus, 1000);
+  updateClock();
+  tickTimer = setInterval(() => { renderStatus(); updateClock(); }, 1000);
   pollTimer = setInterval(() => {
     loadSession();
-    loadRank(5, $("top5"));
+    loadTop5();
     if (activeView === "rank") loadRank(null, $("rankList"));
   }, 15000);
   return true;

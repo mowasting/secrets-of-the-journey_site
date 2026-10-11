@@ -13,6 +13,7 @@
   button.red{background:#dc2626} .box{background:#1c1c1c;padding:14px;border-radius:10px;margin-top:16px}
   .row{display:flex;gap:10px;align-items:center} #msg{margin-top:10px;color:#fbbf24}
   li{margin:4px 0;font-size:14px}
+  .hint{font-size:12px;color:#9ca3af;margin-top:4px;line-height:1.6}
 </style>
 </head>
 <body>
@@ -20,11 +21,10 @@
 <div id="msg"></div>
 <div id="panel" style="display:none">
   <div class="box">
-    <label>مدة السشن (دقيقة)</label><input type="number" id="session_minutes" min="1">
-    <label>الراحة تبدأ بعد كم دقيقة من بداية السشن</label><input type="number" id="break_after_minutes" min="0">
-    <label>مدة الراحة (دقيقة، 0 = بدون راحة)</label><input type="number" id="break_minutes" min="0">
-    <label>الفاصل بين السشنات (دقيقة)</label><input type="number" id="gap_minutes" min="0">
-    <div class="row"><input type="checkbox" id="auto_run"><label style="margin:0">تشغيل تلقائي (السشنات تستمر لحد ما أطفيها)</label></div>
+    <label>مدة السشن الكلية (دقيقة)</label><input type="number" id="session_minutes" min="1">
+    <label>مدة الراحة بنهاية السشن (دقيقة، 0 = بدون راحة)</label><input type="number" id="break_minutes" min="0">
+    <div class="hint">السشن يبدأ بوقت الدراسة دائماً، والراحة تجي بآخره (داخل المدة الكلية). مثال: سشن 60 وراحة 10 = دراسة 50 دقيقة ثم راحة 10 دقائق، وبعدها يبدأ السشن التالي مباشرة.</div>
+    <div class="row" style="margin-top:12px"><input type="checkbox" id="auto_run"><label style="margin:0">تشغيل تلقائي (السشنات تستمر لحد ما أطفيها)</label></div>
     <button onclick="saveSettings()">حفظ الإعدادات</button>
   </div>
   <div class="box">
@@ -38,7 +38,7 @@
 const sb = window.supabase.createClient('https://souefqcmrghnmkxfveut.supabase.co', 'sb_publishable_I6yB9hn7Yx1-MLnndUjs6A_RZuFAh0M');
 const $ = id => document.getElementById(id);
 const msg = t => $('msg').textContent = t;
-const F = ['session_minutes','break_after_minutes','break_minutes','gap_minutes'];
+const F = ['session_minutes','break_minutes'];
 
 async function init(){
   const {data:{session}} = await sb.auth.getSession();
@@ -55,8 +55,12 @@ async function load(){
 }
 async function saveSettings(){
   const u = {auto_run:$('auto_run').checked}; F.forEach(k => u[k] = +$(k).value);
+  if(u.session_minutes < 1){ msg('مدة السشن لازم تكون دقيقة أو أكثر.'); return; }
+  if(u.break_minutes < 0 || u.break_minutes >= u.session_minutes){
+    msg('مدة الراحة لازم تكون أقل من مدة السشن (أو 0 بدون راحة).'); return;
+  }
   const {error} = await sb.from('settings').update(u).eq('id',1);
-  msg(error ? 'خطأ: '+error.message : 'انحفظت الإعدادات ✅');
+  msg(error ? 'خطأ: '+error.message : 'انحفظت الإعدادات ✅ (تنطبق على السشنات الجديدة)');
 }
 async function createSessions(){
   const {error} = await sb.rpc('admin_create_sessions',{n:+$('count').value});
