@@ -222,15 +222,22 @@ $("joinBtn").addEventListener("click", async () => {
 });
 
 /* ---------- الترتيب ---------- */
+/* ترتيب ثابت: الأكثر وقتاً أولاً، وعند التعادل بالاسم */
+function sortRows(rows) {
+  return [...rows].sort((a, b) =>
+    (Number(b.study_seconds) || 0) - (Number(a.study_seconds) || 0) ||
+    String(a.display_name || "").localeCompare(String(b.display_name || "")));
+}
 function renderRank(el, rows) {
   el.replaceChildren();
-  rows.forEach((r) => {
+  sortRows(rows).forEach((r, i) => {
+    const place = i + 1;
     const li = document.createElement("li");
     if (me && r.user_id === me.id) li.classList.add("me");
-    if (Number(r.rank_no) <= 3) li.classList.add("rank-" + r.rank_no);
+    if (place <= 3) li.classList.add("rank-" + place);
     const pos = document.createElement("span");
     pos.className = "pos";
-    pos.textContent = r.rank_no;
+    pos.textContent = place;
     const name = document.createElement("span");
     name.className = "name";
     name.textContent = r.display_name;
@@ -261,9 +268,11 @@ async function loadAccount() {
   $("accUser").textContent = myProfile && myProfile.username ? "@" + myProfile.username : "";
 
   const { data } = await supabaseClient.rpc("get_rank", {});
-  const row = (data || []).find((r) => r.user_id === me.id);
+  const sorted = sortRows(data || []);
+  const idx = sorted.findIndex((r) => r.user_id === me.id);
+  const row = idx >= 0 ? sorted[idx] : null;
   $("accHours").textContent = fmtHours(row ? row.study_seconds : 0);
-  $("accRank").textContent = row ? "#" + row.rank_no : "-";
+  $("accRank").textContent = row ? "#" + (idx + 1) : "-";
 
   const { count } = await supabaseClient
     .from("attendance").select("id", { count: "exact", head: true }).eq("user_id", me.id);
@@ -436,5 +445,12 @@ telegramLoginButton.addEventListener("click", async function () {
 })();
 
 /* ---------- تشغيل ---------- */
+function hideLoader() {
+  const l = $("loader");
+  if (!l) return;
+  l.classList.add("done");
+  setTimeout(() => l.remove(), 600);
+}
 applyLang();
-enterApp();
+Promise.all([enterApp().catch(() => false), sleep(2400)]).then(hideLoader);
+setTimeout(hideLoader, 8000); // احتياط: ما ختى تبقى الشاشة عالقة

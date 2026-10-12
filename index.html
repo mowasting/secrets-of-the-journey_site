@@ -4,10 +4,16 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Secrets Of The Journey Sessions</title>
+    <script>document.documentElement.setAttribute("data-theme", localStorage.getItem("theme") || (matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light"));</script>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-
+<div id="loader" class="loader">
+    <img class="loader-logo" src="logo.jpg" alt="">
+    <div class="loader-title">The Secrets of the Journey</div>
+    <div class="loader-bar"><span></span></div>
+    <div class="loader-text">Loading...</div>
+</div>
 <header class="topbar">
     <div class="brand">
         <img class="logo-sm" src="logo.jpg" alt="">
