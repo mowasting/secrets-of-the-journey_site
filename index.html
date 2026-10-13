@@ -6,6 +6,7 @@
     <title>Secrets Of The Journey Sessions</title>
     <script>document.documentElement.setAttribute("data-theme", localStorage.getItem("theme") || (matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light"));</script>
     <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="sound.css">
 </head>
 <body>
 <div id="loader" class="loader">
@@ -62,6 +63,10 @@
             </div>
         </div>
         <div class="card status-card">
+            <button id="soundBell" class="sound-bell" type="button" aria-haspopup="dialog">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/><line class="bell-slash" x1="3" y1="3" x2="21" y2="21"/></svg>
+                <span class="bell-dot"></span>
+            </button>
             <div id="statusLabel" class="status-label"></div>
             <div id="countdown" class="countdown">--:--:--</div>
             <div id="catScene" class="cat-scene"></div>
@@ -134,6 +139,7 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="supabase.js"></script>
 <script src="cat.js"></script>
+<script src="sound.js"></script>
 <script src="script.js"></script>
 </body>
 </html>

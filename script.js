@@ -81,6 +81,7 @@ function applyLang() {
   document.documentElement.dir = l === "en" ? "ltr" : "rtl";
   document.querySelectorAll("[data-i18n]").forEach((el) => (el.textContent = t(el.dataset.i18n)));
   $("langSelect").value = l;
+  if (window.SJSound) SJSound.refreshLang();
   if (me) {
     renderStatus();
     loadTop5();
@@ -175,27 +176,35 @@ function renderStatus() {
   const s = currentSession;
   const now = Date.now();
   let label = t("noSession"), target = null, canJoin = false, phase = "study";
+  let soundPhase = "none"; // للصوت: none | wait | study | break | ended
 
   if (s) {
     const st = +new Date(s.starts_at), en = +new Date(s.ends_at);
     const bs = s.break_starts_at ? +new Date(s.break_starts_at) : null;
     const be = s.break_ends_at ? +new Date(s.break_ends_at) : null;
     if (now >= en) {
+      soundPhase = "ended";
       if (!reloading) { reloading = true; loadSession().finally(() => (reloading = false)); }
     } else if (now < st) {
+      soundPhase = "wait";
       label = t("startsIn"); target = st;
     } else if (bs && be && now >= bs && now < be) {
       // وقت الراحة (بنهاية السشن): العد التنازلي لحد ما تخلص الراحة
+      soundPhase = "break";
       label = t("breakEndsIn"); target = be; canJoin = false; phase = "break";
     } else if (bs && be) {
       // وقت الدراسة: العد التنازلي لحد ما تبدأ الراحة
+      soundPhase = "study";
       label = t("studyEndsIn"); target = bs; canJoin = true;
     } else {
+      soundPhase = "study";
       label = t("endsIn"); target = en; canJoin = true;
     }
   }
 
   if (window.SJCat) { SJCat.set(phase, !catInit); catInit = true; }
+  // صوت بداية السشن ونهايته (sound.js)
+  if (window.SJSound) SJSound.watch(soundPhase, s ? s.id : null);
 
   $("statusLabel").textContent = label;
   $("countdown").textContent = target ? fmtClock(target - now) : "--:--:--";
