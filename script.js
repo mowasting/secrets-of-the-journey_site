@@ -21,7 +21,7 @@ const I18N = {
     navLive: "السشن المباشر", navRank: "الترتيب", navAccount: "حسابي", navAdmin: "لوحة الأدمن", logout: "تسجيل الخروج",
     hello: "أهلاً", noSession: "ما في سشن حالياً", startsIn: "السشن القادم يبدأ بعد",
     endsIn: "السشن ينتهي بعد", studyEndsIn: "وقت الدراسة ينتهي بعد", breakEndsIn: "الراحة تنتهي بعد",
-    join: "انضمام للسشن", joined: "تم انضمامك ✅", joinedAt: "انضممت الساعة",
+    join: "انضمام للسشن", joined: "تم انضمامك ✅", joinedAt: "انضممت الساعة", sessionEnded: "انتهى السشن الحالي",
     top5: "أفضل 5 هذا الأسبوع", top5Empty: "لا أحد درس هذا الأسبوع بعد، كن الأول!",
     rankTitle: "الترتيب العام", hoursUnit: "س",
     hUnit: "ساعة", mUnit: "دقيقة", and: "و",
@@ -38,7 +38,7 @@ const I18N = {
     navLive: "Live Session", navRank: "Rank", navAccount: "Account", navAdmin: "Admin", logout: "Log out",
     hello: "Hello", noSession: "No session right now", startsIn: "Next session starts in",
     endsIn: "Session ends in", studyEndsIn: "Study time ends in", breakEndsIn: "Break ends in",
-    join: "Join session", joined: "You joined ✅", joinedAt: "Joined at",
+    join: "Join session", joined: "You joined ✅", joinedAt: "Joined at", sessionEnded: "The current session has ended",
     top5: "Top 5 this week", top5Empty: "No one has studied this week yet. Be the first!",
     rankTitle: "Overall ranking", hoursUnit: "h",
     hUnit: "h", mUnit: "min", and: "",
@@ -55,7 +55,7 @@ const I18N = {
     navLive: "سیشنی ڕاستەوخۆ", navRank: "ڕیزبەندی", navAccount: "هەژمارەکەم", navAdmin: "بەڕێوەبەر", logout: "چوونەدەرەوە",
     hello: "سڵاو", noSession: "ئێستا هیچ سیشنێک نییە", startsIn: "سیشنی داهاتوو دەست پێدەکات دوای",
     endsIn: "سیشن کۆتایی دێت دوای", studyEndsIn: "کاتی خوێندن کۆتایی دێت دوای", breakEndsIn: "پشوو کۆتایی دێت دوای",
-    join: "بەشداربوون", joined: "بەشداریت کردووە ✅", joinedAt: "کاتی بەشداربوون",
+    join: "بەشداربوون", joined: "بەشداریت کردووە ✅", joinedAt: "کاتی بەشداربوون", sessionEnded: "سیشنی ئێستا کۆتایی هات",
     top5: "باشترین ٥ ئەم هەفتەیە", top5Empty: "هێشتا کەس ئەم هەفتەیە نەخوێندووە. یەکەم کەس بە!",
     rankTitle: "ڕیزبەندی گشتی", hoursUnit: "کاتژمێر",
     hUnit: "کاتژمێر", mUnit: "خولەک", and: "و",
@@ -82,6 +82,7 @@ function applyLang() {
   document.querySelectorAll("[data-i18n]").forEach((el) => (el.textContent = t(el.dataset.i18n)));
   $("langSelect").value = l;
   if (window.SJSound) SJSound.refreshLang();
+  if (window.SJTasks) SJTasks.refreshLang();
   if (me) {
     renderStatus();
     loadTop5();
@@ -205,18 +206,20 @@ function renderStatus() {
   if (window.SJCat) { SJCat.set(phase, !catInit); catInit = true; }
   // صوت بداية السشن ونهايته (sound.js)
   if (window.SJSound) SJSound.watch(soundPhase, s ? s.id : null);
+  // مهام السشن الحالي (tasks.js)
+  if (window.SJTasks) SJTasks.setSession(s ? s.id : null);
 
   $("statusLabel").textContent = label;
   $("countdown").textContent = target ? fmtClock(target - now) : "--:--:--";
 
   const btn = $("joinBtn");
   if (joinedAtMs) {
-    btn.textContent = t("joined");
+    btn.textContent = phase === "break" ? t("sessionEnded") : t("joined");
     btn.disabled = true;
     $("joinedInfo").textContent = t("joinedAt") + " " +
       new Date(joinedAtMs).toLocaleTimeString(currentLanguage() === "en" ? "en" : "ar-IQ", { hour: "2-digit", minute: "2-digit" });
   } else {
-    btn.textContent = t("join");
+    btn.textContent = phase === "break" ? t("sessionEnded") : t("join");
     btn.disabled = !canJoin;
     $("joinedInfo").textContent = "";
   }
@@ -345,10 +348,12 @@ function setView(name) {
   $("liveView").hidden = name !== "live";
   $("rankView").hidden = name !== "rank";
   $("accountView").hidden = name !== "account";
+  $("tasksView").hidden = name !== "tasks";
   document.querySelectorAll(".tab-item[data-view]").forEach((b) =>
     b.classList.toggle("active", b.dataset.view === name));
   if (name === "rank") loadRank(null, $("rankList"));
   if (name === "account") loadAccount();
+  if (name === "tasks" && window.SJTasks) SJTasks.open();
   window.scrollTo(0, 0);
 }
 document.querySelectorAll(".tab-item[data-view]").forEach((b) =>
