@@ -130,6 +130,7 @@ function makeAvatar(path, name, big) {
 function myName() {
   return (myProfile && (myProfile.first_name || myProfile.username)) || t("student");
 }
+function setText(el, txt) { if (el && el.textContent !== txt) el.textContent = txt; }
 function pad(n) { return String(n).padStart(2, "0"); }
 function fmtClock(ms) {
   const s = Math.max(0, Math.floor(ms / 1000));
@@ -162,14 +163,16 @@ async function loadSession() {
     .order("starts_at", { ascending: true })
     .limit(1)
     .maybeSingle();
-  currentSession = data || null;
-  joinedAtMs = null;
+  // نبقي حالة الانضمام القديمة لحد ما يرجع الرد الجديد (حتى ما يومض الزر)
+  let joined = (data && currentSession && data.id === currentSession.id) ? joinedAtMs : null;
   if (data && me) {
-    const { data: a } = await supabaseClient
+    const { data: a, error } = await supabaseClient
       .from("attendance").select("joined_at")
       .eq("session_id", data.id).eq("user_id", me.id).maybeSingle();
-    if (a) joinedAtMs = new Date(a.joined_at).getTime();
+    if (!error) joined = a ? new Date(a.joined_at).getTime() : null;
   }
+  currentSession = data || null;
+  joinedAtMs = data ? joined : null;
   renderStatus();
 }
 
@@ -209,19 +212,19 @@ function renderStatus() {
   // مهام السشن الحالي (tasks.js)
   if (window.SJTasks) SJTasks.setSession(s ? s.id : null);
 
-  $("statusLabel").textContent = label;
-  $("countdown").textContent = target ? fmtClock(target - now) : "--:--:--";
+  setText($("statusLabel"), label);
+  setText($("countdown"), target ? fmtClock(target - now) : "--:--:--");
 
   const btn = $("joinBtn");
   if (joinedAtMs) {
-    btn.textContent = phase === "break" ? t("sessionEnded") : t("joined");
+    setText(btn, phase === "break" ? t("sessionEnded") : t("joined"));
     btn.disabled = true;
-    $("joinedInfo").textContent = t("joinedAt") + " " +
-      new Date(joinedAtMs).toLocaleTimeString(currentLanguage() === "en" ? "en" : "ar-IQ", { hour: "2-digit", minute: "2-digit" });
+    setText($("joinedInfo"), t("joinedAt") + " " +
+      new Date(joinedAtMs).toLocaleTimeString(currentLanguage() === "en" ? "en" : "ar-IQ", { hour: "2-digit", minute: "2-digit" }));
   } else {
-    btn.textContent = phase === "break" ? t("sessionEnded") : t("join");
+    setText(btn, phase === "break" ? t("sessionEnded") : t("join"));
     btn.disabled = !canJoin;
-    $("joinedInfo").textContent = "";
+    setText($("joinedInfo"), "");
   }
 }
 
@@ -241,6 +244,10 @@ function sortRows(rows) {
     String(a.display_name || "").localeCompare(String(b.display_name || "")));
 }
 function renderRank(el, rows) {
+  const sig = currentLanguage() + "|" + (me ? me.id : "") + "|" +
+    JSON.stringify(rows.map((r) => [r.user_id, r.study_seconds, r.display_name, r.avatar_path]));
+  if (el._sig === sig) return;
+  el._sig = sig;
   el.replaceChildren();
   sortRows(rows).forEach((r, i) => {
     const place = i + 1;
