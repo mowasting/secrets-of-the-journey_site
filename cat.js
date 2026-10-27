@@ -22,6 +22,8 @@
   function drawStand(ctx, ox, f, flip) {
     ctx.save();
     if (flip) { ctx.translate(ox + CW, 0); ctx.scale(-1, 1); } else { ctx.translate(ox, 0); }
+    /* HALLOWEEN hook (does nothing unless halloween.js is on): the cat in the abaya */
+    if (window.SJHalloween && SJHalloween.drawCatStand && SJHalloween.drawCatStand(ctx, f, FLOOR)) { ctx.restore(); return; }
     var a = f % 2 === 0, b = a ? 0 : -1, g = FLOOR;
     function r(x, y, w, h, c) { R(ctx, x, g + y, w, h, c); }
     function leg(x, lift, c) { r(x, -6, 4, 6 - lift, c); r(x, -1 - lift, 4, 1, '#cfd5de'); }
@@ -51,6 +53,8 @@
   function drawSleep(ctx, ox, breathe) {
     ctx.save(); ctx.translate(ox, 0);
     var g = FLOOR, b = breathe ? 1 : 0;
+    /* HALLOWEEN hook (does nothing unless halloween.js is on): the sleeping cat in the abaya */
+    if (window.SJHalloween && SJHalloween.drawCatSleep && SJHalloween.drawCatSleep(ctx, breathe, FLOOR)) { ctx.restore(); return; }
     function r(x, y, w, h, c) { R(ctx, x, g + y, w, h, c); }
     // tail curled
     r(30, -4, 8, 4, C.D); r(35, -8, 3, 5, C.D);

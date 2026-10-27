@@ -20,11 +20,12 @@
 
   var KEY = "palette";
   var ORDER = ["default", "blue", "pink"];
+  if (window.SJHalloween && window.SJHalloween.active) ORDER.push("halloween"); /* HALLOWEEN: 4th palette (only while halloween.js is active) */
 
   var STR = {
-    ar: { title: "تغيير ألوان الموقع", names: { default: "الأصلي", blue: "أزرق", pink: "وردي" } },
-    en: { title: "Change colors", names: { default: "Original", blue: "Blue", pink: "Pink" } },
-    ckb: { title: "گۆڕینی ڕەنگەکان", names: { default: "ئەسڵی", blue: "شین", pink: "پەمەیی" } },
+    ar: { title: "تغيير ألوان الموقع", names: { default: "الأصلي", blue: "أزرق", pink: "وردي", halloween: "هالوين" } }, /* HALLOWEEN */
+    en: { title: "Change colors", names: { default: "Original", blue: "Blue", pink: "Pink", halloween: "Halloween" } }, /* HALLOWEEN */
+    ckb: { title: "گۆڕینی ڕەنگەکان", names: { default: "ئەسڵی", blue: "شین", pink: "پەمەیی", halloween: "هالۆوین" } }, /* HALLOWEEN */
   };
 
   function lang() {
@@ -77,11 +78,11 @@
       var dist = rnd(48, 96);
       var up = Math.sin(a) < 0;
       var el = document.createElement("span");
-      el.className = "pal-p " + (p === "pink" ? "pf" + (1 + (i % 3)) : p === "blue" ? "ps" : "pd");
+      el.className = "pal-p " + (p === "pink" ? "pf" + (1 + (i % 3)) : p === "blue" ? "ps" : p === "halloween" ? "ph" + (1 + (i % 3)) /* HALLOWEEN */ : "pd");
       el.style.setProperty("--dx", Math.cos(a) * dist + "px");
       el.style.setProperty("--dy", Math.sin(a) * dist * (up ? 0.7 : 1.2) + "px");
       el.style.setProperty("--r", rnd(-220, 220) + "deg");
-      el.style.setProperty("--s", (p === "pink" ? rnd(15, 27) : rnd(8, 16)) + "px");
+      el.style.setProperty("--s", (p === "pink" || p === "halloween" /* HALLOWEEN */ ? rnd(15, 27) : rnd(8, 16)) + "px");
       el.style.setProperty("--d", rnd(0, 0.09) + "s");
       if (p === "blue") el.style.setProperty("--c", sparkColors[i % sparkColors.length]);
       if (p === "default") el.style.setProperty("--c", dotColors[i % dotColors.length]);

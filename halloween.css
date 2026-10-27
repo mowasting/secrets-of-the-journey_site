@@ -1,0 +1,111 @@
+/* halloween.css - The Secrets of the Journey      (HALLOWEEN MODE)
+   ---------------------------------------------------------------
+   Everything Halloween lives in this file + halloween.js.
+   It is a 4th palette of the palette button:
+        original -> blue -> pink -> HALLOWEEN -> original
+   It switches itself on for everybody from 25 Oct and OFF again on
+   2 Nov 2026 (dates are at the top of halloween.js).
+   To remove it for good: see the "REMOVE" notes at the top of halloween.js.
+   --------------------------------------------------------------- */
+
+/* ================= COLOURS ================= */
+html[data-palette="halloween"] {
+  --bg:#fdeed9; --g1:#fff3e2; --g2:#f8d6b0;
+  --card:#fff7ec; --card-hi:#ffffff;
+  --text:#3b1d54; --muted:#7a5a8c; --line:#f0d6b8;
+  --accent:#c94a05; --accent-hi:#e8650c; --accent-text:#ffffff;
+  --logo-bg:#c94a05; --logo-text:#ffffff;
+  --shadow:0 15px 45px rgba(110,50,150,.18);
+  --tab-bg:rgba(255,241,224,.96); --tab-fg:#8a5a8f; --tab-on:#c94a05;
+  --petal-a:#f7a93a; --petal-b:#c2480c;
+  --hw-web:url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2080%2080'%3E%3Cpath%20d='M0%200L80.0%200.0M0%200L77.3%2020.7M0%200L69.3%2040.0M0%200L56.6%2056.6M0%200L40.0%2069.3M0%200L20.7%2077.3M0%200L0.0%2080.0M13.0%200.0Q10.8%201.4%2012.6%203.4M12.6%203.4Q10.1%204.2%2011.3%206.5M11.3%206.5Q8.7%206.6%209.2%209.2M9.2%209.2Q6.6%208.7%206.5%2011.3M6.5%2011.3Q4.2%2010.1%203.4%2012.6M3.4%2012.6Q1.4%2010.8%200.0%2013.0M26.0%200.0Q21.7%202.9%2025.1%206.7M25.1%206.7Q20.2%208.4%2022.5%2013.0M22.5%2013.0Q17.3%2013.3%2018.4%2018.4M18.4%2018.4Q13.3%2017.3%2013.0%2022.5M13.0%2022.5Q8.4%2020.2%206.7%2025.1M6.7%2025.1Q2.9%2021.7%200.0%2026.0M41.0%200.0Q34.1%204.5%2039.6%2010.6M39.6%2010.6Q31.8%2013.2%2035.5%2020.5M35.5%2020.5Q27.3%2021.0%2029.0%2029.0M29.0%2029.0Q21.0%2027.3%2020.5%2035.5M20.5%2035.5Q13.2%2031.8%2010.6%2039.6M10.6%2039.6Q4.5%2034.1%200.0%2041.0M57.0%200.0Q47.5%206.2%2055.1%2014.8M55.1%2014.8Q44.2%2018.3%2049.4%2028.5M49.4%2028.5Q38.0%2029.1%2040.3%2040.3M40.3%2040.3Q29.1%2038.0%2028.5%2049.4M28.5%2049.4Q18.3%2044.2%2014.8%2055.1M14.8%2055.1Q6.2%2047.5%200.0%2057.0M74.0%200.0Q61.6%208.1%2071.5%2019.2M71.5%2019.2Q57.4%2023.8%2064.1%2037.0M64.1%2037.0Q49.3%2037.8%2052.3%2052.3M52.3%2052.3Q37.8%2049.3%2037.0%2064.1M37.0%2064.1Q23.8%2057.4%2019.2%2071.5M19.2%2071.5Q8.1%2061.6%200.0%2074.0'%20fill='none'%20stroke='%237b5aa6'%20stroke-opacity='.5'%20stroke-width='1.0'%20stroke-linecap='round'/%3E%3C/svg%3E");
+  --hw-bullet:url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2040%2040'%3E%3Cpath%20d='M18.5%204.5h3.2l.8%206h-4.6z'%20fill='%235f8a2e'/%3E%3Cellipse%20cx='11.5'%20cy='25'%20rx='9.5'%20ry='11.5'%20fill='%23d9620c'/%3E%3Cellipse%20cx='28.5'%20cy='25'%20rx='9.5'%20ry='11.5'%20fill='%23d9620c'/%3E%3Cellipse%20cx='20'%20cy='25'%20rx='9.5'%20ry='12.5'%20fill='%23ff8a1f'/%3E%3Cellipse%20cx='15.5'%20cy='20'%20rx='2.4'%20ry='5'%20fill='%23ffc067'%20fill-opacity='.7'/%3E%3Cpath%20d='M12%2023l3.2-5.2%203.2%205.2z'%20fill='%233a1600'/%3E%3Cpath%20d='M21.6%2023l3.2-5.2%203.2%205.2z'%20fill='%233a1600'/%3E%3Cpath%20d='M11.5%2028.5q8.5%208.5%2017%200q-4%202.6-8.5%202.6q-4.5%200-8.5-2.6z'%20fill='%233a1600'/%3E%3C/svg%3E");
+  --hw-leaf:url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2040%2040'%3E%3Cpath%20d='M20%202l4.2%209.4%207.4-3.4-1.8%209.6%208.2-1.2-6.4%207%203.4%203.6-12.2-.6v8.6h-3.6v-8.6l-12.2.6%203.4-3.6-6.4-7%208.2%201.2-1.8-9.6%207.4%203.4z'%20fill='%23e8641a'/%3E%3Cpath%20d='M20%208v28M20%2022l-7-5M20%2022l7-5'%20stroke='%23a8400c'%20stroke-width='1.2'%20fill='none'%20stroke-linecap='round'/%3E%3C/svg%3E");
+}
+html[data-palette="halloween"][data-theme="dark"] {
+  --bg:#0f0819; --g1:#1d1030; --g2:#080410;
+  --card:#1c1229; --card-hi:#281a3a;
+  --text:#f6e8d2; --muted:#b9a3cf; --line:#392550;
+  --accent:#ff9a2e; --accent-hi:#ffb85c; --accent-text:#1a0c00;
+  --logo-bg:#ff9a2e; --logo-text:#1a0c00;
+  --shadow:0 15px 45px rgba(0,0,0,.6), 0 0 30px rgba(255,120,20,.09);
+  --tab-bg:rgba(13,7,22,.95); --tab-fg:#b9a3cf; --tab-on:#ffa63d;
+  --petal-a:#ffb03a; --petal-b:#e0561a;
+  --hw-web:url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2080%2080'%3E%3Cpath%20d='M0%200L80.0%200.0M0%200L77.3%2020.7M0%200L69.3%2040.0M0%200L56.6%2056.6M0%200L40.0%2069.3M0%200L20.7%2077.3M0%200L0.0%2080.0M13.0%200.0Q10.8%201.4%2012.6%203.4M12.6%203.4Q10.1%204.2%2011.3%206.5M11.3%206.5Q8.7%206.6%209.2%209.2M9.2%209.2Q6.6%208.7%206.5%2011.3M6.5%2011.3Q4.2%2010.1%203.4%2012.6M3.4%2012.6Q1.4%2010.8%200.0%2013.0M26.0%200.0Q21.7%202.9%2025.1%206.7M25.1%206.7Q20.2%208.4%2022.5%2013.0M22.5%2013.0Q17.3%2013.3%2018.4%2018.4M18.4%2018.4Q13.3%2017.3%2013.0%2022.5M13.0%2022.5Q8.4%2020.2%206.7%2025.1M6.7%2025.1Q2.9%2021.7%200.0%2026.0M41.0%200.0Q34.1%204.5%2039.6%2010.6M39.6%2010.6Q31.8%2013.2%2035.5%2020.5M35.5%2020.5Q27.3%2021.0%2029.0%2029.0M29.0%2029.0Q21.0%2027.3%2020.5%2035.5M20.5%2035.5Q13.2%2031.8%2010.6%2039.6M10.6%2039.6Q4.5%2034.1%200.0%2041.0M57.0%200.0Q47.5%206.2%2055.1%2014.8M55.1%2014.8Q44.2%2018.3%2049.4%2028.5M49.4%2028.5Q38.0%2029.1%2040.3%2040.3M40.3%2040.3Q29.1%2038.0%2028.5%2049.4M28.5%2049.4Q18.3%2044.2%2014.8%2055.1M14.8%2055.1Q6.2%2047.5%200.0%2057.0M74.0%200.0Q61.6%208.1%2071.5%2019.2M71.5%2019.2Q57.4%2023.8%2064.1%2037.0M64.1%2037.0Q49.3%2037.8%2052.3%2052.3M52.3%2052.3Q37.8%2049.3%2037.0%2064.1M37.0%2064.1Q23.8%2057.4%2019.2%2071.5M19.2%2071.5Q8.1%2061.6%200.0%2074.0'%20fill='none'%20stroke='%23cdb8f0'%20stroke-opacity='.42'%20stroke-width='1.0'%20stroke-linecap='round'/%3E%3C/svg%3E");
+  --hw-leaf:url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2040%2040'%3E%3Cpath%20d='M20%202l4.2%209.4%207.4-3.4-1.8%209.6%208.2-1.2-6.4%207%203.4%203.6-12.2-.6v8.6h-3.6v-8.6l-12.2.6%203.4-3.6-6.4-7%208.2%201.2-1.8-9.6%207.4%203.4z'%20fill='%23f2a12e'/%3E%3Cpath%20d='M20%208v28M20%2022l-7-5M20%2022l7-5'%20stroke='%23b8620c'%20stroke-width='1.2'%20fill='none'%20stroke-linecap='round'/%3E%3C/svg%3E");
+}
+
+/* ===== page background: purple night with a warm pumpkin glow at the bottom ===== */
+html[data-palette="halloween"] body {
+  background-color:var(--bg);
+  background-image:radial-gradient(ellipse 90% 38% at 50% 110%,rgba(255,122,24,.22),transparent 72%),
+                   linear-gradient(170deg,var(--g1),var(--g2));
+  background-repeat:no-repeat;
+  background-size:100% 100%;
+  background-attachment:fixed;
+  transition:background-color .4s,color .4s,--g1 .5s,--g2 .5s;
+}
+
+/* ===== cards: a cobweb in the top corner (behind the text) + a small pumpkin before every title ===== */
+html[data-palette="halloween"] .card,
+html[data-palette="halloween"] .login-card {
+  position:relative; isolation:isolate;
+  background-image:linear-gradient(165deg,var(--card-hi),var(--card) 72%);
+}
+html[data-palette="halloween"] .card::before,
+html[data-palette="halloween"] .login-card::before {
+  content:""; position:absolute; left:0; top:0; width:86px; height:86px; max-height:100%; z-index:-1; pointer-events:none;
+  background:var(--hw-web) 0 0/86px 86px no-repeat; border-top-left-radius:20px;
+}
+html[data-palette="halloween"] .card h3::before {
+  content:"";display:inline-block;width:19px;height:19px;margin-inline-end:8px;vertical-align:-4px;
+  background:var(--hw-bullet) center/contain no-repeat;
+}
+
+/* ===== glow like candle light ===== */
+html[data-palette="halloween"] .primary:not(:disabled),
+html[data-palette="halloween"] .telegram-button { box-shadow:0 6px 22px rgba(255,122,24,.32); }
+html[data-palette="halloween"][data-theme="dark"] .countdown { animation:hwFlicker 4.2s ease-in-out infinite; }
+html[data-palette="halloween"][data-theme="dark"] .brand-name { text-shadow:0 0 14px rgba(255,150,40,.45); }
+html[data-palette="halloween"] img.logo-sm,
+html[data-palette="halloween"] img.logo { box-shadow:0 0 0 2px var(--accent),0 0 16px rgba(255,122,24,.35); }
+@keyframes hwFlicker {
+  0%,100% { text-shadow:0 0 14px rgba(255,150,40,.30); }
+  18% { text-shadow:0 0 22px rgba(255,160,50,.55); }
+  36% { text-shadow:0 0 12px rgba(255,140,30,.26); }
+  62% { text-shadow:0 0 24px rgba(255,165,60,.55); }
+  80% { text-shadow:0 0 16px rgba(255,150,40,.36); }
+}
+
+/* ===== autumn leaves falling along the edges (re-uses the petals layer of palette.js) ===== */
+html[data-palette="halloween"] .pal-petals { display:block; }
+html[data-palette="halloween"] .pal-petals i.fl { background:var(--hw-leaf) center/contain no-repeat; }
+
+/* ===== the little scene at the top of the Live page (drawn by halloween.js) ===== */
+.hw-shelf {
+  margin:0 0 16px; border-radius:20px; overflow:hidden; line-height:0; background:#0e0820;
+  box-shadow:var(--shadow); animation:cardIn .5s ease both;
+}
+.hw-shelf canvas { display:block; width:100%; height:auto; image-rendering:pixelated; image-rendering:crisp-edges; }
+
+/* ===== the spider hanging from the web of the timer card ===== */
+.hw-spider {
+  position:absolute; left:36px; top:0; width:22px; z-index:3; pointer-events:none;
+  transform-origin:11px 0; animation:hwSwing 3.8s ease-in-out infinite;
+}
+.hw-spider .thr {
+  display:block; width:1px; height:30px; margin:0 auto; background:linear-gradient(#cbb8f0,#8f78c4);
+  animation:hwDrop 6.4s ease-in-out infinite;
+}
+.hw-spider svg { display:block; width:22px; height:20px; margin-top:-2px; }
+html[data-theme="dark"] .hw-spider svg { filter:drop-shadow(0 0 2px rgba(190,150,255,.75)); }
+@keyframes hwSwing { 0%,100% { transform:rotate(-6deg); } 50% { transform:rotate(6deg); } }
+@keyframes hwDrop { 0%,100% { height:24px; } 50% { height:44px; } }
+
+/* ===== bats (a full-screen canvas that never blocks taps) ===== */
+.hw-bats { position:fixed; left:0; top:0; width:100%; height:100%; pointer-events:none; z-index:55; }
+
+/* ===== effect of the palette button for this palette ===== */
+.pal-p.ph1 { background:url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2040%2040'%3E%3Cpath%20d='M18.5%204.5h3.2l.8%206h-4.6z'%20fill='%235f8a2e'/%3E%3Cellipse%20cx='11.5'%20cy='25'%20rx='9.5'%20ry='11.5'%20fill='%23d9620c'/%3E%3Cellipse%20cx='28.5'%20cy='25'%20rx='9.5'%20ry='11.5'%20fill='%23d9620c'/%3E%3Cellipse%20cx='20'%20cy='25'%20rx='9.5'%20ry='12.5'%20fill='%23ff8a1f'/%3E%3Cellipse%20cx='15.5'%20cy='20'%20rx='2.4'%20ry='5'%20fill='%23ffc067'%20fill-opacity='.7'/%3E%3Cpath%20d='M12%2023l3.2-5.2%203.2%205.2z'%20fill='%233a1600'/%3E%3Cpath%20d='M21.6%2023l3.2-5.2%203.2%205.2z'%20fill='%233a1600'/%3E%3Cpath%20d='M11.5%2028.5q8.5%208.5%2017%200q-4%202.6-8.5%202.6q-4.5%200-8.5-2.6z'%20fill='%233a1600'/%3E%3C/svg%3E") center/contain no-repeat; }
+.pal-p.ph2 { background:url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2040%2040'%3E%3Cpath%20d='M20%2013l1.8-5%20.9%205.2q5.5-3.2%2015.3-1.6q-4%202.4-4.4%208q-2.6-2.6-5.4-.6q-1.6-2.4-4.2-.6l-1%206.4l-3-3.6l-3%203.6l-1-6.4q-2.6-1.8-4.2.6q-2.8-2-5.4.6q-.4-5.6-4.4-8q9.8-1.6%2015.3%201.6l.9-5.2z'%20fill='%232b1546'%20stroke='%23b58cff'%20stroke-width='1.3'%20stroke-linejoin='round'/%3E%3Ccircle%20cx='17.6'%20cy='15.6'%20r='1.1'%20fill='%23ff4a4a'/%3E%3Ccircle%20cx='22.4'%20cy='15.6'%20r='1.1'%20fill='%23ff4a4a'/%3E%3C/svg%3E") center/contain no-repeat; }
+.pal-p.ph3 { background:url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2040%2040'%3E%3Cpath%20d='M8%2035V17a12%2012%200%200%201%2024%200v18l-4-3.4-4%203.4-4-3.4-4%203.4-4-3.4z'%20fill='%23f2edff'%20stroke='%23b9a3e6'%20stroke-width='1.2'/%3E%3Cellipse%20cx='15.5'%20cy='17'%20rx='2.2'%20ry='3'%20fill='%232a1a44'/%3E%3Cellipse%20cx='24.5'%20cy='17'%20rx='2.2'%20ry='3'%20fill='%232a1a44'/%3E%3Cellipse%20cx='20'%20cy='25'%20rx='2.2'%20ry='2.8'%20fill='%232a1a44'/%3E%3C/svg%3E") center/contain no-repeat; }
