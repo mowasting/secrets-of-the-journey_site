@@ -1,0 +1,76 @@
+/* christmas.css : ألوان ثيم الكريسماس (تشتغل فقط لما <html data-season="christmas">، يعني بالموسم)
+   الخلفية خضراء، الأيقونات حمراء وبنية. أي شي برا الموسم ما يتأثر. */
+
+/* ===== الألوان الأساسية (نهار) ===== */
+html[data-season="christmas"]:root{
+  --bg:#cfe8c9; --card:#f3faef; --text:#4a2f1d; --muted:#7d6a52; --line:#d4e7cc;
+  --accent:#c62832; --accent-text:#ffffff; --logo-bg:#c62832; --logo-text:#ffffff;
+  --shadow:0 15px 45px rgba(30,80,45,.22);
+}
+/* ===== ليل ===== */
+html[data-season="christmas"][data-theme="dark"]:root{
+  --bg:#0d2a19; --card:#173b27; --text:#f6efe0; --muted:#b7c9b1; --line:#25503a;
+  --accent:#d6343c; --accent-text:#ffffff; --logo-bg:#d6343c; --logo-text:#ffffff;
+  --shadow:0 15px 45px rgba(0,0,0,.55);
+}
+html[data-season="christmas"] body{padding-top:14px}
+
+/* ===== الشريط السفلي: أيقونات بنية، والنشطة حمراء ===== */
+html[data-season="christmas"][data-theme="dark"] .tabbar{background:rgba(13,42,25,.95);color:#c9a77d;border-top-color:rgba(214,52,60,.45)}
+html[data-season="christmas"][data-theme="light"] .tabbar{background:rgba(243,250,239,.96);color:#8a5a2b;border-top-color:rgba(198,40,50,.35)}
+html[data-season="christmas"][data-theme="dark"] .tab-item.active{color:#ff6b6b}
+html[data-season="christmas"][data-theme="light"] .tab-item.active{color:#c62832}
+html[data-season="christmas"] .tab-item.active .tab-avatar{border-color:#c62832}
+
+/* ===== الشريط العلوي والأزرار ===== */
+html[data-season="christmas"] .brand-name{color:var(--text)}
+html[data-season="christmas"] .seg-btn.active{background:#c62832;color:#fff}
+html[data-season="christmas"] .gear-btn{background:linear-gradient(145deg,#d9a877,#8a5a2b)}
+html[data-season="christmas"] .gear-btn svg g{fill:#4a2f1d}
+html[data-season="christmas"] .logout-btn{background:rgba(198,40,50,.14);color:#c62832}
+html[data-season="christmas"][data-theme="dark"] .logout-btn{color:#ff8a8a}
+html[data-season="christmas"] .credit-link{color:#c62832 !important}
+html[data-season="christmas"][data-theme="dark"] .credit-link{color:#ff8a8a !important}
+html[data-season="christmas"] .loader-bar span{background:linear-gradient(90deg,#c62832,#2f8f4e)}
+
+/* ===== المتجر والغابة: ألوان الأزرار ===== */
+html[data-season="christmas"] .mk-tab.on{background:#c62832;color:#fff;border-color:#c62832}
+html[data-season="christmas"] .mk-btn:not(.ghost):not(.on){background:#c62832;color:#fff}
+html[data-season="christmas"] .mk-btn.on{background:#2f8f4e}
+html[data-season="christmas"] .sj-lock-bar i{background:#c62832}
+
+/* ===== ثلج على حواف البطاقات ===== */
+html[data-season="christmas"] .card{position:relative}
+html[data-season="christmas"] .card::before{content:"";position:absolute;left:16px;right:16px;top:-5px;height:9px;pointer-events:none;z-index:2;
+  background:
+    radial-gradient(circle at 7px 3px,#fff 5px,transparent 5.5px) 0 0/22px 9px repeat-x,
+    linear-gradient(#fff,#fff) 0 0/100% 4px no-repeat;
+  border-radius:6px;filter:drop-shadow(0 1px 0 rgba(60,100,120,.25))}
+html[data-season="christmas"] .card.xm-card::before{display:none}
+
+/* ===== بطاقة السشن (الهيرو): سماء من فوق لسانتا والغزلان، وكل المحتوى فوق الرسمة ===== */
+html[data-season="christmas"] .xm-card{overflow:hidden;padding-top:84px}
+.xm-hero{position:absolute;inset:0;width:100%;height:100%;z-index:0;image-rendering:pixelated;image-rendering:crisp-edges;pointer-events:none}
+html[data-season="christmas"] .xm-card > :not(.xm-hero):not(.sound-bell){position:relative;z-index:1}
+html[data-season="christmas"] .xm-card .sound-bell{z-index:3}
+html[data-season="christmas"] .xm-card .status-label,
+html[data-season="christmas"] .xm-card .countdown{color:#fff;text-shadow:0 2px 0 rgba(0,40,20,.55),0 0 10px rgba(0,40,20,.55)}
+html[data-season="christmas"][data-theme="light"] .xm-card .status-label,
+html[data-season="christmas"][data-theme="light"] .xm-card .countdown{color:#3c2415;text-shadow:0 1px 0 rgba(255,255,255,.8),0 0 8px rgba(255,255,255,.7)}
+html[data-season="christmas"] .xm-card #joinedInfo{color:#3c2415;text-shadow:0 1px 0 #fff}
+html[data-season="christmas"][data-theme="dark"] .xm-card #joinedInfo{color:#4a2f1d}
+
+/* ===== أضوية أعلى الصفحة ===== */
+.xm-lights{position:fixed;top:0;left:0;right:0;height:16px;z-index:48;pointer-events:none}
+.xm-lights svg{position:absolute;inset:0;width:100%;height:10px}
+.xm-b{position:absolute;width:7px;height:10px;margin-left:-3px;border-radius:50% 50% 55% 55%;opacity:.95;animation:xmBlink 1.4s ease-in-out infinite}
+.xm-b.c0{background:#ff4d4d;box-shadow:0 0 8px 2px rgba(255,77,77,.7)}
+.xm-b.c1{background:#ffd34f;box-shadow:0 0 8px 2px rgba(255,211,79,.7)}
+.xm-b.c2{background:#4dd0ff;box-shadow:0 0 8px 2px rgba(77,208,255,.7)}
+.xm-b.c3{background:#7dff7d;box-shadow:0 0 8px 2px rgba(125,255,125,.7)}
+@keyframes xmBlink{0%,100%{opacity:1}50%{opacity:.35}}
+
+/* ===== ثلج متساقط ===== */
+#xmSnow{position:fixed;inset:0;width:100%;height:100%;z-index:49;pointer-events:none}
+
+@media (prefers-reduced-motion:reduce){.xm-b{animation:none}}

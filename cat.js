@@ -33,6 +33,8 @@
     leg(15, a ? 1 : 0, C.S); leg(22, a ? 0 : 1, C.S);
     // chubby body
     r(10, -19 + b, 18, 14, C.W); r(8, -17 + b, 22, 10, C.W); r(9, -7 + b, 20, 1, C.S);
+    /* SEASON hook: كنزة الكريسماس (ما تسوي شي برا الموسم) */
+    if (window.SJSeason) SJSeason.catPart(ctx, 'standBody', b, g); /* SEASON */
     // near legs
     leg(11, a ? 0 : 1, C.W); leg(25, a ? 1 : 0, C.W);
     // big fluffy head
@@ -47,6 +49,7 @@
     r(6, -18 + b, 3, 1, C.N); r(7, -17 + b, 1, 1, C.N);
     r(-5, -17 + b, 6, 1, C.wh); r(-4, -15 + b, 5, 1, C.wh);
     r(14, -17 + b, 6, 1, C.wh); r(14, -15 + b, 5, 1, C.wh);
+    if (window.SJSeason) SJSeason.catPart(ctx, 'standHead', b, g); /* SEASON: قبعة سانتا */
     ctx.restore();
   }
 
@@ -60,6 +63,7 @@
     r(30, -4, 8, 4, C.D); r(35, -8, 3, 5, C.D);
     // round chubby body
     r(6, -13 - b, 24, 13 + b, C.W); r(5, -10, 26, 9, C.W); r(6, -1, 24, 1, C.S);
+    if (window.SJSeason) SJSeason.catPart(ctx, 'sleepBody', b, g); /* SEASON */
     // head resting
     r(1, -14, 12, 13, C.W); r(0, -11, 14, 9, C.W);
     r(2, -14, 10, 3, C.T); r(3, -11, 8, 1, C.T); r(11, -13, 2, 3, C.D);
@@ -70,6 +74,7 @@
     r(-5, -5, 6, 1, C.wh); r(-4, -3, 5, 1, C.wh);
     r(14, -5, 6, 1, C.wh); r(14, -3, 5, 1, C.wh);
     r(0, -1, 7, 1, C.S);
+    if (window.SJSeason) SJSeason.catPart(ctx, 'sleepHead', b, g); /* SEASON */
     ctx.restore();
   }
 
@@ -90,6 +95,7 @@
     R(ctx, 0, FLOOR, W, 2, C.floor);
     // doorway interior
     R(ctx, 76, 10, 18, 36, C.inside);
+    if (window.SJSeason) SJSeason.scene(ctx, 'back', t, FLOOR); /* SEASON: شجرة وهدايا وأضوية */
     // cat (clipped at the far side of the doorway so it really goes "inside")
     if (st.mode !== 'hidden') {
       ctx.save(); ctx.beginPath(); ctx.rect(0, 0, 94, H); ctx.clip();
@@ -115,11 +121,12 @@
       R(ctx, 94 - w, 10, 1, 36, C.leafDark);
       if (w > 6) R(ctx, 94 - w + 2, 28, 2, 2, C.knob);
     }
+    if (window.SJSeason) SJSeason.scene(ctx, 'front', t, FLOOR); /* SEASON: إكليل الباب */
     // sleeping Zzz
     if (st.mode === 'sleep') {
       for (var i = 0; i < 3; i++) {
         var ph = (t * 0.45 + i / 3) % 1;
-        drawZ(ctx, st.x + 4 + i * 6, FLOOR - 22 - ph * 12, 1 - ph, i === 0 ? 4 : 5);
+        drawZ(ctx, st.x + 4 + i * 6, FLOOR - 22 - (window.SJSeason && SJSeason.id() ? 9 : 0) - ph * 12, 1 - ph, i === 0 ? 4 : 5);
       }
     }
   }
@@ -208,3 +215,10 @@
   }
   if (typeof module !== 'undefined') module.exports = { drawStand: drawStand, drawSleep: drawSleep, drawScene: drawScene, W: W, H: H, state: st };
 })();
+
+
+
+
+
+
+

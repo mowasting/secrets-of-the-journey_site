@@ -5,14 +5,14 @@
 #tasksView{animation:viewIn .28s ease}
 .tk-card{padding:18px}
 
-/* ===== the three tabs (session / week / month) ===== */
-.tk-seg{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;padding:5px;margin-bottom:16px;
+/* ===== the four tabs (session / day / week / month) ===== */
+.tk-seg{display:grid;grid-template-columns:repeat(4,1fr);gap:4px;padding:5px;margin-bottom:16px;
   background:var(--bg);border:1px solid var(--line);border-radius:18px}
 .tk-seg-btn{border:0;background:transparent;color:var(--muted);font:inherit;border-radius:14px;padding:9px 4px;
   display:flex;flex-direction:column;align-items:center;gap:2px;cursor:pointer;
   -webkit-tap-highlight-color:transparent;transition:background .25s,color .25s,transform .15s}
-.tk-seg-btn span{font-size:13px}
-.tk-seg-btn b{font-size:20px;font-variant-numeric:tabular-nums;direction:ltr;color:var(--text);transition:color .25s}
+.tk-seg-btn span{font-size:12.5px;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.tk-seg-btn b{font-size:17px;font-variant-numeric:tabular-nums;direction:ltr;color:var(--text);transition:color .25s}
 .tk-seg-btn:active{transform:scale(.96)}
 .tk-seg-btn.active{background:var(--accent);color:var(--accent-text)}
 .tk-seg-btn.active b{color:var(--accent-text)}

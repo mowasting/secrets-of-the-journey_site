@@ -1,0 +1,85 @@
+/* ramadan.css : ألوان وشكل ثيم رمضان (تشتغل فقط لما <html data-season="ramadan">)
+   ليل بنفسجي مع ذهبي، مثل الصورة الي رسلتها. */
+
+html[data-season="ramadan"]:root{
+  --bg:#ece3f5; --card:#fff8ec; --text:#2f2147; --muted:#7a6a92; --line:#e8dcef;
+  --accent:#e0a02e; --accent-text:#2a1b0b; --logo-bg:#2a1b4a; --logo-text:#ffc857;
+  --shadow:0 12px 36px rgba(60,35,110,.22);
+}
+html[data-season="ramadan"][data-theme="dark"]:root{
+  --bg:#160f2c; --card:#271c3a; --text:#f6e7c8; --muted:#b9a7cc; --line:#3a2d52;
+  --accent:#e8a93d; --accent-text:#2a1b0b; --logo-bg:#e8a93d; --logo-text:#2a1b0b;
+  --shadow:0 12px 36px rgba(0,0,0,.6);
+}
+html[data-season="ramadan"] body{padding-top:14px}
+
+/* بطاقات بإطار ذهبي */
+html[data-season="ramadan"] .card{border:2px solid rgba(224,160,46,.6);border-radius:14px}
+html[data-season="ramadan"][data-theme="dark"] .card{border-color:rgba(232,169,61,.55)}
+
+/* الشريط السفلي */
+html[data-season="ramadan"][data-theme="dark"] .tabbar{background:rgba(26,18,42,.96);color:#b79a6b;border-top:2px solid rgba(232,169,61,.5)}
+html[data-season="ramadan"][data-theme="light"] .tabbar{background:rgba(255,248,236,.97);color:#8a6a3a;border-top:2px solid rgba(224,160,46,.5)}
+html[data-season="ramadan"][data-theme="dark"] .tab-item.active{color:#ffcb5c}
+html[data-season="ramadan"][data-theme="light"] .tab-item.active{color:#b87a10}
+html[data-season="ramadan"] .tab-item.active .tab-avatar{border-color:#e8a93d}
+
+/* أزرار */
+html[data-season="ramadan"] .seg-btn.active{background:#e8a93d;color:#2a1b0b}
+html[data-season="ramadan"] .mk-tab.on{background:#e8a93d;color:#2a1b0b;border-color:#e8a93d}
+html[data-season="ramadan"] .mk-btn:not(.ghost):not(.on){background:#e8a93d;color:#2a1b0b}
+html[data-season="ramadan"] .mk-btn.on{background:#7a4fc0}
+html[data-season="ramadan"] .sj-lock-bar i{background:#e8a93d}
+html[data-season="ramadan"] .credit-link{color:#ffcb5c !important}
+html[data-season="ramadan"] .loader-bar span{background:linear-gradient(90deg,#e8a93d,#7a4fc0)}
+html[data-season="ramadan"] .gear-btn{background:linear-gradient(145deg,#ffd987,#b8822a)}
+
+/* ===== بطاقة السشن (الهيرو) ===== */
+html[data-season="ramadan"] .rm-card{overflow:hidden;padding-top:124px;border-radius:12px;border-width:3px}
+.rm-hero{position:absolute;inset:0;width:100%;height:100%;z-index:0;image-rendering:pixelated;image-rendering:crisp-edges;pointer-events:none}
+html[data-season="ramadan"] .rm-card > :not(.rm-hero):not(.sound-bell){position:relative;z-index:1}
+html[data-season="ramadan"] .rm-card .sound-bell{z-index:3}
+html[data-season="ramadan"] .rm-card .status-label{color:#ffe7b0;text-shadow:0 2px 0 rgba(20,10,40,.8),0 0 10px rgba(20,10,40,.8)}
+html[data-season="ramadan"] .rm-card .countdown{color:#fff1cf;font-family:"Silkscreen","Courier New",monospace;font-weight:700;letter-spacing:1px;
+  text-shadow:0 3px 0 #b8822a,0 0 14px rgba(240,184,74,.55)}
+html[data-season="ramadan"][data-theme="light"] .rm-card .status-label{color:#2f2147;text-shadow:0 1px 0 rgba(255,255,255,.7),0 0 8px rgba(255,255,255,.7)}
+html[data-season="ramadan"][data-theme="light"] .rm-card .countdown{color:#3a2412;text-shadow:0 2px 0 #ffe7b0,0 0 10px rgba(255,255,255,.8)}
+html[data-season="ramadan"] .rm-card #joinedInfo{color:#ffe7b0;text-shadow:0 1px 0 rgba(20,10,40,.9)}
+html[data-season="ramadan"][data-theme="light"] .rm-card #joinedInfo{color:#2f2147;text-shadow:0 1px 0 #fff}
+/* زر الانضمام الذهبي مع نجمتين */
+html[data-season="ramadan"] .rm-card #joinBtn{background:linear-gradient(#f4be5a,#dc9a2a);color:#2a1b0b;border:3px solid #8a5a1a;border-radius:12px;
+  box-shadow:0 4px 0 #8a5a1a;font-weight:800;position:relative}
+html[data-season="ramadan"] .rm-card #joinBtn::before,
+html[data-season="ramadan"] .rm-card #joinBtn::after{content:"✦";position:absolute;top:50%;transform:translateY(-50%);color:#8a5a1a;font-size:16px}
+html[data-season="ramadan"] .rm-card #joinBtn::before{inset-inline-start:14px}
+html[data-season="ramadan"] .rm-card #joinBtn::after{inset-inline-end:14px}
+
+/* ===== أضوية ذهبية + فوانيس معلّقة ===== */
+.rm-lights{position:fixed;top:0;left:0;right:0;height:16px;z-index:48;pointer-events:none}
+.rm-lights svg:first-child{position:absolute;inset:0;width:100%;height:10px}
+.rm-b{position:absolute;width:7px;height:10px;margin-left:-3px;border-radius:50% 50% 55% 55%;animation:rmBlink 1.6s ease-in-out infinite}
+.rm-b.c0{background:#ffd27a;box-shadow:0 0 8px 2px rgba(255,210,122,.75)}
+.rm-b.c1{background:#ffb84a;box-shadow:0 0 8px 2px rgba(255,184,74,.75)}
+.rm-b.c2{background:#ff8fb3;box-shadow:0 0 8px 2px rgba(255,143,179,.65)}
+.rm-b.c3{background:#b99bff;box-shadow:0 0 8px 2px rgba(185,155,255,.65)}
+@keyframes rmBlink{0%,100%{opacity:1}50%{opacity:.4}}
+.rm-hang{position:absolute;top:0;transform-origin:50% 0;animation:rmSway 4s ease-in-out infinite;filter:drop-shadow(0 0 8px rgba(255,200,87,.6))}
+.rm-hang.l{left:3%}
+.rm-hang.r{right:3%;animation-delay:-2s}
+@keyframes rmSway{0%,100%{transform:rotate(-5deg)}50%{transform:rotate(5deg)}}
+
+/* ===== بانر الإفطار ===== */
+.rm-banner{position:fixed;top:0;left:50%;z-index:2147483000;width:min(94vw,540px);transform:translate(-50%,-130%);transition:transform .8s cubic-bezier(.2,1.2,.3,1);
+  display:flex;align-items:center;justify-content:center;gap:6px;padding:26px 14px 14px;
+  background:linear-gradient(#2a1b4a,#3a2560);border:3px solid #e8a93d;border-top:0;border-radius:0 0 22px 22px;
+  box-shadow:0 14px 40px rgba(0,0,0,.55),inset 0 0 0 2px rgba(255,200,87,.25);color:#fff1cf;direction:rtl}
+.rm-banner.show{transform:translate(-50%,0)}
+.rm-bt{flex:1;text-align:center;display:flex;flex-direction:column;gap:4px;min-width:0}
+.rm-bt b{font-size:1.25rem;color:#ffd987;text-shadow:0 2px 0 rgba(0,0,0,.5)}
+.rm-bt .rm-s{font-size:.85rem;opacity:.9}
+.rm-bt .rm-c{font-family:"Silkscreen","Courier New",monospace;font-size:1rem;direction:ltr;color:#ffcb5c}
+.rm-bl{flex:0 0 auto;transform-origin:50% 0;animation:rmSway 3.6s ease-in-out infinite;margin-top:-26px;filter:drop-shadow(0 0 10px rgba(255,200,87,.7))}
+.rm-bl.r{animation-delay:-1.8s}
+.rm-x{position:absolute;top:8px;inset-inline-end:10px;border:0;background:rgba(255,255,255,.12);color:#fff1cf;width:26px;height:26px;border-radius:50%;cursor:pointer;font-size:13px}
+
+@media (prefers-reduced-motion:reduce){.rm-b,.rm-hang,.rm-bl{animation:none}}

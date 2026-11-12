@@ -10,8 +10,13 @@
     <link rel="stylesheet" href="sound.css">
     <link rel="stylesheet" href="palette.css">
     <link rel="stylesheet" href="tasks.css">
-    <link rel="stylesheet" href="halloween.css"> <!-- HALLOWEEN -->
-    <script src="halloween.js"></script> <!-- HALLOWEEN -->
+    <link rel="stylesheet" href="avatar.css">
+    <link rel="stylesheet" href="christmas.css"> <!-- SEASON: CHRISTMAS -->
+    <link rel="stylesheet" href="ramadan.css"> <!-- SEASON: RAMADAN -->
+    <link rel="stylesheet" href="eid.css"> <!-- SEASON: EID -->
+    <script src="ramadan-config.js"></script> <!-- SEASON: RAMADAN dates -->
+    <script src="eid-config.js"></script> <!-- SEASON: EID dates -->
+    <script src="season.js"></script> <!-- SEASON -->
 </head>
 <body>
 <div id="loader" class="loader">
@@ -26,18 +31,12 @@
         <span class="brand-name">Secrets Of The Journey</span>
     </div>
     <div class="top-actions">
-        <select id="langSelect" aria-label="Language">
-            <option value="ar">العربية</option>
-            <option value="en">English</option>
-            <option value="ckb">کوردی</option>
-        </select>
-        <div class="pal-wrap">
-            <button id="paletteBtn" class="pal-btn" type="button">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="4.5" width="17" height="15" rx="4"/><circle cx="9" cy="9.8" r="1.7" fill="currentColor" stroke="none"/><path d="M4.2 17.6l4.7-4.9a1.3 1.3 0 0 1 1.9 0l2.4 2.6 2-2.5a1.3 1.3 0 0 1 2 0l3.2 4.1" fill="currentColor" fill-opacity=".28"/></svg>
-            </button>
-            <span id="palTip" class="pal-tip" aria-live="polite"></span>
-            <span id="palFx" class="pal-fx" aria-hidden="true"></span>
-        </div>
+        <!-- العملات: ثابتة فوق، تظهر بعد تسجيل الدخول -->
+        <button id="coinsBtn" class="coins-btn" type="button" hidden aria-haspopup="dialog">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10" fill="#f4c542" stroke="#b8860b" stroke-width="1.6"/><circle cx="12" cy="12" r="6" fill="none" stroke="#b8860b" stroke-width="1.5"/><rect x="11" y="8" width="2" height="8" rx="1" fill="#b8860b"/></svg>
+            <b id="coinsNum">0</b>
+        </button>
+        <!-- الثيم (رجع فوق بجنب العملات) -->
         <label class="theme-toggle" title="Theme">
             <input type="checkbox" id="themeToggle">
             <span class="tt-track">
@@ -46,6 +45,10 @@
             </span>
             <span class="tt-knob"></span>
         </label>
+        <!-- اختصار للإعدادات (يفتح صفحة الحساب عند الإعدادات مباشرة) -->
+        <button id="settingsBtn" class="gear-btn" type="button" hidden aria-label="Settings">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><g fill="#4a4f57"><rect x="10.3" y="2.4" width="3.4" height="19.2" rx="1.3"/><rect x="10.3" y="2.4" width="3.4" height="19.2" rx="1.3" transform="rotate(45 12 12)"/><rect x="10.3" y="2.4" width="3.4" height="19.2" rx="1.3" transform="rotate(90 12 12)"/><rect x="10.3" y="2.4" width="3.4" height="19.2" rx="1.3" transform="rotate(135 12 12)"/><circle cx="12" cy="12" r="6.8"/></g><circle cx="12" cy="12" r="2.7" fill="#d3d6db"/></svg>
+        </button>
     </div>
 </header>
 
@@ -60,6 +63,11 @@
             <span data-i18n="continue"></span>
         </button>
         <p class="login-note" data-i18n="loginNote"></p>
+        <select id="langSelectLogin" class="login-lang" aria-label="Language">
+            <option value="ar">العربية</option>
+            <option value="en">English</option>
+            <option value="ckb">کوردی</option>
+        </select>
     </section>
 </main>
 
@@ -73,6 +81,7 @@
                 <div class="muted" data-i18n="hello"></div>
                 <div id="meName" class="me-name"></div>
             </div>
+            <div id="clock" class="clock me-clock">--:--:--</div>
         </div>
         <div class="card status-card">
             <button id="soundBell" class="sound-bell" type="button" aria-haspopup="dialog">
@@ -85,17 +94,14 @@
             <button id="joinBtn" class="primary" data-i18n="join"></button>
             <div id="joinedInfo" class="muted"></div>
         </div>
-        <div class="card">
-            <div class="card-head">
-                <h3 data-i18n="top5"></h3>
-                <div id="clock" class="clock">--:--:--</div>
-            </div>
-            <ul id="top5" class="rank-list"></ul>
-            <div id="top5Empty" class="muted empty" hidden data-i18n="top5Empty"></div>
-        </div>
     </section>
 
     <section id="rankView" hidden>
+        <div class="card">
+            <h3 data-i18n="top10"></h3>
+            <div id="podium" class="pod-wrap"></div>
+            <div id="top10Empty" class="muted empty" hidden data-i18n="top5Empty"></div>
+        </div>
         <div class="card">
             <h3 data-i18n="rankTitle"></h3>
             <ul id="rankList" class="rank-list"></ul>
@@ -104,6 +110,14 @@
 
     <section id="tasksView" hidden>
         <div id="tasksRoot"></div>
+    </section>
+
+    <section id="marketView" hidden>
+        <div id="marketRoot"></div>
+    </section>
+
+    <section id="forestView" hidden>
+        <div id="forestRoot"></div>
     </section>
 
     <section id="accountView" hidden>
@@ -116,7 +130,34 @@
             <div class="stat"><span data-i18n="statHours"></span><b id="accHours">-</b></div>
             <div class="stat"><span data-i18n="statRank"></span><b id="accRank">-</b></div>
             <div class="stat"><span data-i18n="statSessions"></span><b id="accSessions">-</b></div>
+            <button id="customizeBtn" class="primary cz-open" data-i18n="czOpen"></button>
         </div>
+
+        <!-- الإعدادات: اللغة + الألوان -->
+        <div class="card" id="settingsCard">
+            <h3 data-i18n="accSettings"></h3>
+            <div class="set-row">
+                <span data-i18n="accLang"></span>
+                <select id="langSelect" aria-label="Language">
+                    <option value="ar">العربية</option>
+                    <option value="en">English</option>
+                    <option value="ckb">کوردی</option>
+                </select>
+            </div>
+            <div class="set-row">
+                <span data-i18n="accPalette"></span>
+                <div class="top-actions set-ctl">
+                    <div class="pal-wrap">
+                        <button id="paletteBtn" class="pal-btn" type="button">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="4.5" width="17" height="15" rx="4"/><circle cx="9" cy="9.8" r="1.7" fill="currentColor" stroke="none"/><path d="M4.2 17.6l4.7-4.9a1.3 1.3 0 0 1 1.9 0l2.4 2.6 2-2.5a1.3 1.3 0 0 1 2 0l3.2 4.1" fill="currentColor" fill-opacity=".28"/></svg>
+                        </button>
+                        <span id="palTip" class="pal-tip" aria-live="polite"></span>
+                        <span id="palFx" class="pal-fx" aria-hidden="true"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <div class="card">
             <div class="card-head">
                 <h3 data-i18n="progressTitle"></h3>
@@ -128,7 +169,34 @@
             <div id="progTotal" class="muted"></div>
             <div id="progChart" class="prog-chart"></div>
         </div>
+
+        <!-- معلومات المطوّر -->
+        <div class="card credit-card">
+            <div class="credit-line">
+                <span data-i18n="creditLead"></span>
+                <a id="creditName" class="credit-link" href="https://t.me/x04cv" target="_blank" rel="noopener" data-i18n="creditName"></a>
+            </div>
+            <div class="muted credit-hint" data-i18n="creditHint"></div>
+        </div>
+
         <button id="logoutBtn" class="logout-btn" data-i18n="logout"></button>
+    </section>
+
+    <section id="customizeView" hidden>
+        <div class="card">
+            <!-- شريط ثابت فوق: رجوع + عنوان + زر الحفظ + رسالة النتيجة -->
+            <div class="cz-bar">
+                <div class="cz-top">
+                    <button id="czBack" class="cz-back" type="button" aria-label="Back">&#8592;</button>
+                    <h3 data-i18n="czTitle"></h3>
+                    <button id="czSave" class="primary cz-save" type="button" data-i18n="czSave"></button>
+                </div>
+                <div id="czMsg" class="cz-msg" aria-live="polite"></div>
+            </div>
+            <div id="czStage" class="cz-stage"></div>
+            <div id="czTabs" class="cz-tabs"></div>
+            <div id="czOptions"></div>
+        </div>
     </section>
 </main>
 
@@ -150,6 +218,18 @@
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6h11M9 12h11M9 18h11"/><path d="M3.5 6l1.5 1.5L7.5 5M3.5 12l1.5 1.5L7.5 11M3.5 18l1.5 1.5L7.5 17"/></svg>
         <span id="tabTasksLabel">مهامي</span>
     </button>
+    <button class="tab-item" data-view="market">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9l1.500-5h13L20 9"/><path d="M4 9v11h16V9"/><path d="M4 9a2.700 2.700 0 0 0 5.300 0 2.700 2.700 0 0 0 5.400 0A2.700 2.700 0 0 0 20 9"/><path d="M10 20v-5h4v5"/></svg>
+        <span id="tabMarketLabel">المتجر</span>
+    </button>
+    <button id="youtubeNavBtn" class="tab-item" type="button" aria-label="YouTube" aria-haspopup="dialog">
+        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.5 3.6 12 3.6 12 3.6s-7.5 0-9.4.5A3 3 0 0 0 .5 6.2 31 31 0 0 0 0 12a31 31 0 0 0 .5 5.8 3 3 0 0 0 2.1 2.1c1.9.5 9.4.5 9.4.5s7.5 0 9.4-.5a3 3 0 0 0 2.1-2.1A31 31 0 0 0 24 12a31 31 0 0 0-.5-5.8ZM9.6 15.6V8.4l6.3 3.6-6.3 3.6Z"/></svg>
+        <span id="youtubeNavLabel">YouTube</span>
+    </button>
+    <button class="tab-item" data-view="forest">
+        <svg viewBox="0 0 24 24" fill="currentColor" shape-rendering="crispEdges" aria-hidden="true"><rect x="9" y="1" width="6" height="2"/><rect x="6" y="3" width="12" height="2"/><rect x="4" y="5" width="16" height="4"/><rect x="6" y="9" width="12" height="2"/><rect x="10" y="11" width="4" height="6"/><rect x="2" y="18" width="20" height="4" opacity=".45"/></svg>
+        <span id="tabForestLabel">تقدّمي</span>
+    </button>
     <button class="tab-item" data-view="account">
         <span id="tabAvatarBox" class="tab-avatar"></span>
         <span data-i18n="navAccount"></span>
@@ -158,10 +238,19 @@
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="supabase.js"></script>
+<script src="christmas.js"></script> <!-- SEASON: CHRISTMAS -->
+<script src="ramadan.js"></script> <!-- SEASON: RAMADAN -->
+<script src="eid.js"></script> <!-- SEASON: EID -->
 <script src="cat.js"></script>
 <script src="sound.js"></script>
 <script src="palette.js"></script>
 <script src="tasks.js"></script>
+<script src="avatar.js"></script>
+<script src="badges.js"></script>
+<script src="market.js"></script>
+<script src="forest.js"></script>
+<script src="avatar-ui.js"></script>
 <script src="script.js"></script>
+<script src="youtube.js"></script>
 </body>
 </html>

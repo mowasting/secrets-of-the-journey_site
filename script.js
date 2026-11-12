@@ -9,8 +9,19 @@ let joinedAtMs = null;
 let reloading = false;
 let tickTimer = null;
 let pollTimer = null;
+let coinsTimer = null;
 let activeView = "live";
 let catInit = false;
+let myFlair = { is_gold: false, equipped: [] };
+
+/* ---------- فتح الميزات حسب ساعات الدراسة ---------- */
+const UNLOCK_HOURS = { forest: 50, tasks: 50, youtube: 70 };
+const UNLOCK_BYPASS = false;   // true = يفتح كلشي للتجربة فقط
+let myStudySecs = 0, hoursLoaded = false, hoursTimer = null;
+function featureUnlocked(name) {
+  if (UNLOCK_BYPASS) return true;
+  return hoursLoaded && myStudySecs >= (UNLOCK_HOURS[name] || 0) * 3600;
+}
 
 /* ---------- اللغات ---------- */
 const I18N = {
@@ -18,7 +29,7 @@ const I18N = {
     welcome: "أهلاً بعودتك", subtitle: "سجّل دخولك لتكمل رحلتك الدراسية.",
     continue: "المتابعة عبر تيليجرام",
     loginNote: "سيُستخدم حساب تيليجرام الخاص بك للتحقق من هويتك بشكل آمن.",
-    navLive: "السشن المباشر", navRank: "الترتيب", navAccount: "حسابي", navAdmin: "لوحة الأدمن", logout: "تسجيل الخروج",
+    navLive: "السشن المباشر", navRank: "أفضل 10", navAccount: "حسابي", navAdmin: "لوحة الأدمن", logout: "تسجيل الخروج",
     hello: "أهلاً", noSession: "ما في سشن حالياً", startsIn: "السشن القادم يبدأ بعد",
     endsIn: "السشن ينتهي بعد", studyEndsIn: "وقت الدراسة ينتهي بعد", breakEndsIn: "الراحة تنتهي بعد",
     join: "انضمام للسشن", joined: "تم انضمامك ✅", joinedAt: "انضممت الساعة", sessionEnded: "انتهى السشن الحالي",
@@ -30,12 +41,24 @@ const I18N = {
     loginFailed: "فشل تسجيل الدخول أو انتهت المهلة. حاول مرة ثانية.",
     joinFailed: "تعذّر الانضمام. حاول مرة ثانية.", student: "طالب",
     progressTitle: "تقدّمي", periodWeek: "أسبوعي", periodMonth: "شهري", progTotal: "المجموع",
+    top10: "أفضل 10 هذا الأسبوع",
+    czOpen: "تخصيص الشخصية", czTitle: "تخصيص الشخصية", czSave: "حفظ الشخصية", czSaved: "تم الحفظ ✅",
+    czSaveFail: "تعذّر الحفظ، حاول مرة ثانية.", czLocked: "هذا العنصر يُفتح بالعملات 🔒",
+    czTab_extras: "إكسسوارات", czSec_glasses: "النظارات", czSec_hat: "القبعات", czTab_body: "الجسم", czTab_skin: "البشرة", czTab_face: "الوجه", czTab_hair: "الشعر", czTab_beard: "اللحية", czTab_outfit: "الأزياء",
+    czSec_gender: "الجنس", czSec_head: "الحجاب", czSec_headc: "لون الحجاب", czSec_skin: "لون البشرة", czSec_eyes: "العيون", czSec_eyec: "لون العين", czSec_mouth: "الفم",
+    czSec_hair: "الشكل", czSec_hairc: "لون الشعر", czSec_beard: "اللحية", czSec_outfit: "الأزياء",
+    lockNeed: "تنفتح بعد {h} ساعة دراسة", lockHave: "ساعاتك", lockLeft: "الباقي", lockOk: "تمام",
+    lockFeat_forest: "تقدّمي", lockFeat_tasks: "مهامي", lockFeat_youtube: "YouTube",
+    coinsTitle: "عملاتي", coinsRule1: "كل سشن تنضم له = عملتين", coinsRule2: "5 سشنات متتالية = 20 عملة إضافية",
+    accSettings: "الإعدادات", accLang: "اللغة", accPalette: "الألوان", accTheme: "الثيم",
+    creditLead: "تم تصميم وبرمجة هذا الموقع بواسطة", creditName: "محمد",
+    creditHint: "اضغط على الاسم للاقتراحات أو الإبلاغ عن مشكلة",
   },
   en: {
     welcome: "Welcome back", subtitle: "Sign in to continue your study journey.",
     continue: "Continue with Telegram",
     loginNote: "Your Telegram account will be used to securely verify your identity.",
-    navLive: "Live Session", navRank: "Rank", navAccount: "Account", navAdmin: "Admin", logout: "Log out",
+    navLive: "Live Session", navRank: "Top 10", navAccount: "Account", navAdmin: "Admin", logout: "Log out",
     hello: "Hello", noSession: "No session right now", startsIn: "Next session starts in",
     endsIn: "Session ends in", studyEndsIn: "Study time ends in", breakEndsIn: "Break ends in",
     join: "Join session", joined: "You joined ✅", joinedAt: "Joined at", sessionEnded: "The current session has ended",
@@ -47,12 +70,24 @@ const I18N = {
     loginFailed: "Login failed or expired. Please try again.",
     joinFailed: "Could not join. Please try again.", student: "Student",
     progressTitle: "My progress", periodWeek: "Weekly", periodMonth: "Monthly", progTotal: "Total",
+    top10: "Top 10 this week",
+    czOpen: "Customize character", czTitle: "Customize character", czSave: "Save character", czSaved: "Saved ✅",
+    czSaveFail: "Could not save. Please try again.", czLocked: "Unlocks with coins 🔒",
+    czTab_extras: "Extras", czSec_glasses: "Glasses", czSec_hat: "Hats", czTab_body: "Body", czTab_skin: "Skin", czTab_face: "Face", czTab_hair: "Hair", czTab_beard: "Beard", czTab_outfit: "Outfits",
+    czSec_gender: "Gender", czSec_head: "Headscarf", czSec_headc: "Headscarf color", czSec_skin: "Skin tone", czSec_eyes: "Eyes", czSec_eyec: "Eye color", czSec_mouth: "Mouth",
+    czSec_hair: "Style", czSec_hairc: "Hair color", czSec_beard: "Beard", czSec_outfit: "Outfits",
+    lockNeed: "Unlocks after {h} study hours", lockHave: "Your hours", lockLeft: "Left", lockOk: "OK",
+    lockFeat_forest: "My progress", lockFeat_tasks: "Tasks", lockFeat_youtube: "YouTube",
+    coinsTitle: "My coins", coinsRule1: "Every session you join = 2 coins", coinsRule2: "5 sessions in a row = 20 bonus coins",
+    accSettings: "Settings", accLang: "Language", accPalette: "Colors", accTheme: "Theme",
+    creditLead: "This site was designed and developed by", creditName: "Mohammed",
+    creditHint: "Tap the name for suggestions or to report a problem",
   },
   ckb: {
     welcome: "بەخێربێیتەوە", subtitle: "بچۆ ژوورەوە بۆ بەردەوامبوون لە گەشتی خوێندنەکەت.",
     continue: "بەردەوامبوون بە تێلێگرام",
     loginNote: "ئەکاونتی تێلێگرامەکەت بۆ سەلماندنی ناسنامەکەت بە شێوەیەکی سەلامەت بەکاردێت.",
-    navLive: "سیشنی ڕاستەوخۆ", navRank: "ڕیزبەندی", navAccount: "هەژمارەکەم", navAdmin: "بەڕێوەبەر", logout: "چوونەدەرەوە",
+    navLive: "سیشنی ڕاستەوخۆ", navRank: "باشترین ١٠", navAccount: "هەژمارەکەم", navAdmin: "بەڕێوەبەر", logout: "چوونەدەرەوە",
     hello: "سڵاو", noSession: "ئێستا هیچ سیشنێک نییە", startsIn: "سیشنی داهاتوو دەست پێدەکات دوای",
     endsIn: "سیشن کۆتایی دێت دوای", studyEndsIn: "کاتی خوێندن کۆتایی دێت دوای", breakEndsIn: "پشوو کۆتایی دێت دوای",
     join: "بەشداربوون", joined: "بەشداریت کردووە ✅", joinedAt: "کاتی بەشداربوون", sessionEnded: "سیشنی ئێستا کۆتایی هات",
@@ -64,6 +99,18 @@ const I18N = {
     loginFailed: "چوونەژوورەوە سەرکەوتوو نەبوو یان کاتەکەی تەواو بوو. دووبارە هەوڵبدەرەوە.",
     joinFailed: "بەشداریکردن سەرکەوتوو نەبوو. دووبارە هەوڵبدەرەوە.", student: "خوێندکار",
     progressTitle: "پێشکەوتنم", periodWeek: "هەفتانە", periodMonth: "مانگانە", progTotal: "کۆی گشتی",
+    top10: "باشترین ١٠ ئەم هەفتەیە",
+    czOpen: "دیزاینی کارەکتەر", czTitle: "دیزاینی کارەکتەر", czSave: "پاشەکەوتکردنی کارەکتەر", czSaved: "پاشەکەوت کرا ✅",
+    czSaveFail: "پاشەکەوت نەکرا. دووبارە هەوڵبدەرەوە.", czLocked: "بە دراو دەکرێتەوە 🔒",
+    czTab_extras: "ئاکسسوار", czSec_glasses: "چاویلکە", czSec_hat: "کڵاو", czTab_body: "جەستە", czTab_skin: "پێست", czTab_face: "ڕوخسار", czTab_hair: "قژ", czTab_beard: "ڕیش", czTab_outfit: "جل و بەرگ",
+    czSec_gender: "ڕەگەز", czSec_head: "حیجاب", czSec_headc: "ڕەنگی حیجاب", czSec_skin: "ڕەنگی پێست", czSec_eyes: "چاو", czSec_eyec: "ڕەنگی چاو", czSec_mouth: "دەم",
+    czSec_hair: "شێواز", czSec_hairc: "ڕەنگی قژ", czSec_beard: "ڕیش", czSec_outfit: "جل و بەرگ",
+    lockNeed: "دوای {h} کاتژمێری خوێندن دەکرێتەوە", lockHave: "کاتژمێرەکانت", lockLeft: "ماوە", lockOk: "باشە",
+    lockFeat_forest: "پێشکەوتنم", lockFeat_tasks: "ئەرکەکانم", lockFeat_youtube: "YouTube",
+    coinsTitle: "دراوەکانم", coinsRule1: "هەر سیشنێک بەشداری تێدا بکەیت = ٢ دراو", coinsRule2: "٥ سیشنی بەدوای یەک = ٢٠ دراوی زیادە",
+    accSettings: "ڕێکخستنەکان", accLang: "زمان", accPalette: "ڕەنگەکان", accTheme: "ڕووکار",
+    creditLead: "ئەم ماڵپەڕە دیزاین و پڕۆگرام کراوە لەلایەن", creditName: "محەمەد",
+    creditHint: "کرتە لە ناوەکە بکە بۆ پێشنیار یان ڕاپۆرتکردنی کێشە",
   },
 };
 
@@ -81,13 +128,16 @@ function applyLang() {
   document.documentElement.dir = l === "en" ? "ltr" : "rtl";
   document.querySelectorAll("[data-i18n]").forEach((el) => (el.textContent = t(el.dataset.i18n)));
   $("langSelect").value = l;
+  if ($("langSelectLogin")) $("langSelectLogin").value = l;
   if (window.SJSound) SJSound.refreshLang();
   if (window.SJTasks) SJTasks.refreshLang();
+  if (window.SJMarket) SJMarket.refreshLang();
+  if (window.SJForest) SJForest.refreshLang();
   if (me) {
     renderStatus();
-    loadTop5();
-    if (activeView === "rank") loadRank(null, $("rankList"));
+    if (activeView === "rank") { loadPodium(); loadRank(null, $("rankList")); }
     if (activeView === "account") loadAccount();
+    if (activeView === "customize" && window.SJAvatarUI) SJAvatarUI.open(true);
   }
 }
 
@@ -100,6 +150,157 @@ function callFunction(name, body) {
   }).then((r) => r.json()).catch(() => ({ status: "error" }));
 }
 function sleep(ms) { return new Promise((r) => setTimeout(r, ms)); }
+
+/* ---------- ستايل الواجهة الجديدة (العملات + الإعدادات + معلومات المطوّر) ---------- */
+function injectUiCss() {
+  if (document.getElementById("sjUiCss")) return;
+  const s = document.createElement("style");
+  s.id = "sjUiCss";
+  s.textContent =
+    ".coins-btn{display:inline-flex;align-items:center;gap:6px;padding:5px 12px;border-radius:999px;border:1px solid rgba(224,165,38,.7);background:rgba(224,165,38,.16);color:inherit;font:inherit;font-weight:800;cursor:pointer;transition:transform .15s}" +
+    ".coins-btn[hidden]{display:none}.coins-btn:active{transform:scale(.94)}.coins-btn svg{width:20px;height:20px;flex:0 0 auto}" +
+    ".coins-big{font-size:2.2rem;font-weight:800;margin:6px 0 10px}" +
+    ".gear-btn{display:inline-flex;align-items:center;justify-content:center;width:34px;height:34px;padding:0;border-radius:10px;border:1px solid rgba(0,0,0,.18);background:linear-gradient(145deg,#e6e8ec,#a3a8b0);box-shadow:0 1px 3px rgba(0,0,0,.3);cursor:pointer;transition:transform .2s}" +
+    ".gear-btn[hidden]{display:none}.gear-btn svg{width:22px;height:22px}.gear-btn:hover svg{animation:sjGear 1.2s linear infinite}.gear-btn:active{transform:scale(.92)}" +
+    "@keyframes sjGear{to{transform:rotate(360deg)}}" +
+    "@keyframes sjFlash{0%,100%{box-shadow:none}50%{box-shadow:0 0 0 3px rgba(224,165,38,.8)}}.flash-card{animation:sjFlash 1s ease 2}" +
+    ".topbar .top-actions{display:flex;align-items:center;gap:10px}" +
+    ".set-row{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 0;border-bottom:1px solid rgba(127,127,127,.2)}" +
+    ".set-row:last-child{border-bottom:0}" +
+    ".set-row select,.login-lang{background:transparent;color:inherit;border:1px solid rgba(127,127,127,.45);border-radius:10px;padding:7px 12px;font:inherit;cursor:pointer}" +
+    ".set-row select option,.login-lang option{color:#222;background:#fff}" +
+    ".login-lang{display:block;margin:16px auto 0}" +
+    ".set-ctl{margin:0 !important;flex:0 0 auto;position:relative}" +
+    ".credit-card{text-align:center}.credit-line{font-weight:600;line-height:1.9}" +
+    ".credit-link{color:#2b8cff !important;font-weight:800;text-decoration:none;margin-inline-start:4px}" +
+    ".credit-link:hover{text-decoration:underline}.credit-hint{margin-top:6px;font-size:.85rem}";
+  document.head.appendChild(s);
+}
+
+/* ---------- العملات (فوق بكل الصفحات) ---------- */
+function updateCoinsBadge(n) {
+  const e = $("coinsNum");
+  if (e) e.textContent = String(Number(n) || 0);
+}
+async function refreshCoins() {
+  if (!me) return;
+  const { data, error } = await supabaseClient.rpc("get_shop");
+  if (!error && data) updateCoinsBadge(data.points);
+}
+function openCoinsModal() {
+  injectLockCss();
+  const ov = document.createElement("div");
+  ov.className = "sj-lock-ov";
+  const box = document.createElement("div");
+  box.className = "sj-lock-box";
+  const h = document.createElement("h3");
+  const big = document.createElement("div");
+  big.className = "coins-big";
+  const r1 = document.createElement("p");
+  const r2 = document.createElement("p");
+  const ok = document.createElement("button");
+  ok.className = "primary";
+  ok.type = "button";
+  box.append(h, big, r1, r2, ok);
+  ov.appendChild(box);
+  h.textContent = t("coinsTitle");
+  big.textContent = $("coinsNum").textContent;
+  r1.textContent = "🪙 " + t("coinsRule1");
+  r2.textContent = "🔥 " + t("coinsRule2");
+  ok.textContent = t("lockOk");
+  ok.addEventListener("click", () => ov.remove());
+  ov.addEventListener("click", (e) => { if (e.target === ov) ov.remove(); });
+  document.body.appendChild(ov);
+  refreshCoins().then(() => { big.textContent = $("coinsNum").textContent; });
+}
+$("coinsBtn").addEventListener("click", openCoinsModal);
+$("settingsBtn").addEventListener("click", () => {
+  setView("account");
+  setTimeout(() => {
+    const c = $("settingsCard");
+    if (!c) return;
+    c.scrollIntoView({ behavior: "smooth", block: "center" });
+    c.classList.remove("flash-card");
+    void c.offsetWidth;
+    c.classList.add("flash-card");
+  }, 80);
+});
+
+/* ---------- ساعات الدراسة وقفل الميزات ---------- */
+function injectLockCss() {
+  if (document.getElementById("sjLockCss")) return;
+  const s = document.createElement("style");
+  s.id = "sjLockCss";
+  s.textContent =
+    ".tab-item{position:relative}.tab-lock{position:absolute;top:2px;inset-inline-end:calc(50% - 22px);font-size:10px;line-height:1}" +
+    ".tab-item:not(.locked) .tab-lock{display:none}.tab-item.locked svg{opacity:.45}" +
+    ".sj-lock-ov{position:fixed;inset:0;z-index:2147483100;display:flex;align-items:center;justify-content:center;padding:16px;background:rgba(5,12,28,.72)}" +
+    ".sj-lock-box{width:min(360px,100%);background:var(--card,#fff);color:var(--text,#17233d);border-radius:20px;padding:22px;text-align:center;box-shadow:0 20px 70px #0006}" +
+    ".sj-lock-box h3{margin:0 0 8px;font-size:1.15rem}.sj-lock-box p{margin:6px 0}" +
+    ".sj-lock-bar{height:10px;border-radius:99px;background:rgba(127,127,127,.25);overflow:hidden;margin:14px 0}" +
+    ".sj-lock-bar i{display:block;height:100%;background:var(--accent,#b8955a);border-radius:99px;transition:width .5s}" +
+    ".sj-lock-box button{margin-top:12px}";
+  document.head.appendChild(s);
+}
+async function refreshHours() {
+  if (!me) return;
+  const { data, error } = await supabaseClient.rpc("get_rank", {});
+  if (error || !data) return;
+  const row = data.find((r) => r.user_id === me.id);
+  myStudySecs = row ? Number(row.study_seconds) || 0 : 0;
+  hoursLoaded = true;
+  applyLocks();
+}
+function applyLocks() {
+  injectLockCss();
+  [["forest", '.tab-item[data-view="forest"]'], ["tasks", '.tab-item[data-view="tasks"]'], ["youtube", "#youtubeNavBtn"]].forEach((p) => {
+    const b = document.querySelector(p[1]);
+    if (!b) return;
+    if (!b.querySelector(".tab-lock")) {
+      const badge = document.createElement("span");
+      badge.className = "tab-lock";
+      badge.textContent = "🔒";
+      b.appendChild(badge);
+    }
+    b.classList.toggle("locked", !featureUnlocked(p[0]));
+  });
+}
+function openLockModal(name, onUnlocked) {
+  injectLockCss();
+  const need = UNLOCK_HOURS[name];
+  const ov = document.createElement("div");
+  ov.className = "sj-lock-ov";
+  const box = document.createElement("div");
+  box.className = "sj-lock-box";
+  const h = document.createElement("h3");
+  const l1 = document.createElement("p");
+  const bar = document.createElement("div");
+  bar.className = "sj-lock-bar";
+  const fill = document.createElement("i");
+  bar.appendChild(fill);
+  const l2 = document.createElement("p");
+  const l3 = document.createElement("p");
+  const ok = document.createElement("button");
+  ok.className = "primary";
+  ok.type = "button";
+  box.append(h, l1, bar, l2, l3, ok);
+  ov.appendChild(box);
+  function paint() {
+    h.textContent = t("lockFeat_" + name) + " 🔒";
+    l1.textContent = t("lockNeed").replace("{h}", need);
+    fill.style.width = Math.min(100, (myStudySecs / (need * 3600)) * 100) + "%";
+    l2.textContent = t("lockHave") + ": " + fmtHours(myStudySecs);
+    l3.textContent = t("lockLeft") + ": " + fmtHours(Math.max(0, need * 3600 - myStudySecs));
+    ok.textContent = t("lockOk");
+  }
+  ok.addEventListener("click", () => ov.remove());
+  ov.addEventListener("click", (e) => { if (e.target === ov) ov.remove(); });
+  paint();
+  document.body.appendChild(ov);
+  refreshHours().then(() => {
+    if (featureUnlocked(name)) { ov.remove(); if (onUnlocked) onUnlocked(); } else paint();
+  });
+}
 
 async function pollLogin(token, pollSecret) {
   const deadline = Date.now() + 10 * 60 * 1000;
@@ -233,7 +434,7 @@ $("joinBtn").addEventListener("click", async () => {
   const { error } = await supabaseClient.rpc("join_current_session");
   if (error) alert(t("joinFailed"));
   await loadSession();
-  loadTop5();
+  refreshCoins();
 });
 
 /* ---------- الترتيب ---------- */
@@ -245,7 +446,7 @@ function sortRows(rows) {
 }
 function renderRank(el, rows) {
   const sig = currentLanguage() + "|" + (me ? me.id : "") + "|" +
-    JSON.stringify(rows.map((r) => [r.user_id, r.study_seconds, r.display_name, r.avatar_path]));
+    JSON.stringify(rows.map((r) => [r.user_id, r.study_seconds, r.display_name, r.avatar_path, r.is_gold, r.badges]));
   if (el._sig === sig) return;
   el._sig = sig;
   el.replaceChildren();
@@ -260,23 +461,47 @@ function renderRank(el, rows) {
     const name = document.createElement("span");
     name.className = "name";
     name.textContent = r.display_name;
+    const isDev = window.SJBadges && SJBadges.isDev(r.user_id);
+    if (isDev) name.classList.add("sj-devname");
+    else if (r.is_gold) name.classList.add("gold-name");
+    const bdg = window.SJBadges ? SJBadges.chips(r, 20) : null;
     const hrs = document.createElement("span");
     hrs.className = "hrs";
     hrs.textContent = fmtHours(r.study_seconds);
-    li.append(pos, makeAvatar(r.avatar_path, r.display_name), name, hrs);
+    li.append(pos, makeAvatar(r.avatar_path, r.display_name), name);
+    if (bdg) li.appendChild(bdg);
+    li.appendChild(hrs);
     el.appendChild(li);
   });
 }
 async function loadRank(limit, el) {
-  const { data, error } = await supabaseClient.rpc("get_rank", limit ? { limit_count: limit } : {});
+  const args = limit ? { limit_count: limit } : {};
+  let { data, error } = await supabaseClient.rpc("get_rank_v2", args);
+  if (error) ({ data, error } = await supabaseClient.rpc("get_rank", args));   // احتياط إذا SQL الشارات ما انشغّل بعد
   if (!error && data) renderRank(el, data);
 }
-/* أعلى 5 للأسبوع الحالي */
-async function loadTop5() {
-  const { data, error } = await supabaseClient.rpc("get_week_rank", { limit_count: 5 });
+/* مدرج أفضل 10 للأسبوع الحالي */
+async function loadPodium() {
+  const { data, error } = await supabaseClient.rpc("get_week_rank_v2", { limit_count: 10 });
   if (error || !data) return;
-  renderRank($("top5"), data);
-  $("top5Empty").hidden = data.length > 0;
+  if (window.SJAvatarUI) SJAvatarUI.renderPodium($("podium"), sortRows(data).slice(0, 10));
+  $("top10Empty").hidden = data.length > 0;
+}
+
+/* ---------- اسمي الذهبي (إذا كنت بطل أسبوع سابق) ---------- */
+function applyFlair() {
+  ["meName", "accName"].forEach((id) => {
+    const e = $(id);
+    if (!e) return;
+    const dev = !!(me && window.SJBadges && SJBadges.isDev(me.id));
+    e.classList.toggle("sj-devname", dev);
+    e.classList.toggle("gold-name", !!myFlair.is_gold && !dev);
+  });
+}
+async function loadFlair() {
+  const { data, error } = await supabaseClient.rpc("get_my_flair");
+  if (!error && data && data[0]) myFlair = data[0];
+  applyFlair();
 }
 
 /* ---------- صفحة الحساب ---------- */
@@ -285,6 +510,7 @@ async function loadAccount() {
   $("accAvatarBox").replaceChildren(makeAvatar(myProfile && myProfile.avatar_path, name, true));
   $("accName").textContent = name;
   $("accUser").textContent = myProfile && myProfile.username ? "@" + myProfile.username : "";
+  applyFlair();
 
   const { data } = await supabaseClient.rpc("get_rank", {});
   const sorted = sortRows(data || []);
@@ -292,6 +518,7 @@ async function loadAccount() {
   const row = idx >= 0 ? sorted[idx] : null;
   $("accHours").textContent = fmtHours(row ? row.study_seconds : 0);
   $("accRank").textContent = row ? "#" + (idx + 1) : "-";
+  myStudySecs = row ? Number(row.study_seconds) || 0 : 0; hoursLoaded = true; applyLocks();
 
   const { count } = await supabaseClient
     .from("attendance").select("id", { count: "exact", head: true }).eq("user_id", me.id);
@@ -351,28 +578,41 @@ $("progMonth").addEventListener("click", () => setPeriod("month"));
 
 /* ---------- التنقل (الشريط السفلي) ---------- */
 function setView(name) {
+  if ((name === "forest" || name === "tasks") && !featureUnlocked(name)) { openLockModal(name, () => setView(name)); return; }
   activeView = name;
   $("liveView").hidden = name !== "live";
   $("rankView").hidden = name !== "rank";
   $("accountView").hidden = name !== "account";
   $("tasksView").hidden = name !== "tasks";
+  $("customizeView").hidden = name !== "customize";
+  $("marketView").hidden = name !== "market";
+  $("forestView").hidden = name !== "forest";
   document.querySelectorAll(".tab-item[data-view]").forEach((b) =>
-    b.classList.toggle("active", b.dataset.view === name));
-  if (name === "rank") loadRank(null, $("rankList"));
+    b.classList.toggle("active", b.dataset.view === (name === "customize" ? "account" : name)));
+  if (name === "rank") { loadPodium(); loadRank(null, $("rankList")); }
+  if (name === "customize" && window.SJAvatarUI) SJAvatarUI.open();
+  if (name === "market" && window.SJMarket) SJMarket.open();
+  if (name === "forest" && window.SJForest) SJForest.open();
   if (name === "account") loadAccount();
   if (name === "tasks" && window.SJTasks) SJTasks.open();
   window.scrollTo(0, 0);
 }
 document.querySelectorAll(".tab-item[data-view]").forEach((b) =>
   b.addEventListener("click", () => setView(b.dataset.view)));
+$("customizeBtn").addEventListener("click", () => setView("customize"));
+$("czBack").addEventListener("click", () => setView("account"));
 
 $("logoutBtn").addEventListener("click", async () => {
   await supabaseClient.auth.signOut();
   location.reload();
 });
-$("langSelect").addEventListener("change", (e) => {
-  localStorage.setItem("lang", e.target.value);
-  applyLang();
+["langSelect", "langSelectLogin"].forEach((id) => {
+  const sel = $(id);
+  if (!sel) return;
+  sel.addEventListener("change", (e) => {
+    localStorage.setItem("lang", e.target.value);
+    applyLang();
+  });
 });
 
 /* ---------- الدخول للموقع ---------- */
@@ -382,25 +622,42 @@ async function enterApp() {
   if (!user) return false;
   me = user;
 
-  const { data: profile } = await supabaseClient
-    .from("users").select("first_name, username, avatar_path")
+  let { data: profile, error: profErr } = await supabaseClient
+    .from("users").select("first_name, username, avatar_path, avatar_config")
     .eq("id", user.id).maybeSingle();
+  if (profErr) {
+    // احتياط: إذا عمود avatar_config ما انضاف بعد بقاعدة البيانات
+    ({ data: profile } = await supabaseClient
+      .from("users").select("first_name, username, avatar_path")
+      .eq("id", user.id).maybeSingle());
+  }
   myProfile = profile || null;
 
   const name = myName();
   $("meName").textContent = name;
   $("meAvatarBox").replaceChildren(makeAvatar(myProfile && myProfile.avatar_path, name));
-    $("tabAvatarBox").replaceChildren(makeAvatar(myProfile && myProfile.avatar_path, name));
-  
+  $("tabAvatarBox").replaceChildren(makeAvatar(myProfile && myProfile.avatar_path, name));
+
+  if (window.SJMarket) { SJMarket.refreshLang(); SJMarket.load(); }
+  loadFlair();
 
   $("loginView").hidden = true;
   $("appView").hidden = false;
   $("tabbar").hidden = false;
+  $("coinsBtn").hidden = false;
+  $("settingsBtn").hidden = false;
+  refreshCoins();
+  clearInterval(coinsTimer);
+  coinsTimer = setInterval(refreshCoins, 60000);
 
   const { data: isAdmin } = await supabaseClient.rpc("sj_is_admin");
   $("adminLink").hidden = !isAdmin;
 
-  await Promise.all([loadSession(), loadTop5()]);
+  await loadSession();
+  applyLocks();
+  refreshHours();
+  clearInterval(hoursTimer);
+  hoursTimer = setInterval(refreshHours, 5 * 60 * 1000);
 
   clearInterval(tickTimer);
   clearInterval(pollTimer);
@@ -408,8 +665,7 @@ async function enterApp() {
   tickTimer = setInterval(() => { renderStatus(); updateClock(); }, 1000);
   pollTimer = setInterval(() => {
     loadSession();
-    loadTop5();
-    if (activeView === "rank") loadRank(null, $("rankList"));
+    if (activeView === "rank") { loadPodium(); loadRank(null, $("rankList")); }
   }, 15000);
   return true;
 }
@@ -451,6 +707,14 @@ telegramLoginButton.addEventListener("click", async function () {
   loginInProgress = false;
 });
 
+/* ---------- قفل اليوتيوب (70 ساعة) ---------- */
+$("youtubeNavBtn").addEventListener("click", (e) => {
+  if (featureUnlocked("youtube")) return;
+  e.preventDefault();
+  e.stopImmediatePropagation();
+  openLockModal("youtube", () => $("youtubeNavBtn").click());
+}, true);
+
 /* ---------- الثيم ---------- */
 (function () {
   const toggle = $("themeToggle");
@@ -472,6 +736,7 @@ function hideLoader() {
   l.classList.add("done");
   setTimeout(() => l.remove(), 600);
 }
+injectUiCss();
 applyLang();
 Promise.all([enterApp().catch(() => false), sleep(2400)]).then(hideLoader);
 setTimeout(hideLoader, 8000); // احتياط: ما ختى تبقى الشاشة عالقة

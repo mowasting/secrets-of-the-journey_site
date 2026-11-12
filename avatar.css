@@ -1,0 +1,95 @@
+/* avatar.css : مدرج Top 10 + صفحة تخصيص الشخصية */
+.me-clock{margin-inline-start:auto}
+
+/* ===== المدرج ===== */
+.pod-wrap{direction:ltr}
+.pod-top{display:flex;align-items:flex-end;justify-content:center;gap:6px;margin-bottom:20px}
+.pod-col{flex:1;display:flex;flex-direction:column;align-items:center;min-width:0}
+.pod-col.place-1{flex:1.3}
+.pod-tag{max-width:100%;padding:4px 10px;border-radius:999px;font-size:12px;font-weight:bold;background:var(--card);
+  border:1px solid var(--line);color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+  unicode-bidi:plaintext;margin-bottom:4px}
+.pod-tag.me{background:var(--accent);color:var(--accent-text);border-color:var(--accent)}
+.pod-fig{image-rendering:pixelated;display:block;max-width:100%;height:auto}
+.pod-gap{height:100px}
+.pod-step{width:100%;border-radius:10px 10px 0 0;display:flex;flex-direction:column;align-items:center;
+  justify-content:center;gap:2px;padding:4px 2px;font-weight:bold}
+.place-1 .pod-step{height:78px;background:linear-gradient(#ffe27a,#f0b429);color:#4a3200}
+.place-2 .pod-step{height:58px;background:linear-gradient(#f1f3f6,#b7bec9);color:#333a45}
+.place-3 .pod-step{height:44px;background:linear-gradient(#e8a569,#b8692a);color:#3d1f08}
+.pod-num{font-size:20px;line-height:1}
+.pod-hrs{font-size:10px;font-weight:normal;white-space:nowrap}
+.place-1 .pod-fig{animation:podBob 2.4s ease-in-out infinite}
+@keyframes podBob{0%,100%{transform:translateY(0)}50%{transform:translateY(-4px)}}
+
+.pod-rest{display:grid;grid-template-columns:repeat(4,1fr);gap:14px 6px}
+.pod-tile{display:flex;flex-direction:column;align-items:center;min-width:0}
+.pod-tile .pod-tag{font-size:11px;padding:3px 8px}
+.pod-plat{width:100%;border-radius:8px 8px 4px 4px;background:var(--line);text-align:center;padding:3px 2px;
+  display:flex;flex-direction:column;align-items:center;gap:1px}
+.pod-pnum{font-size:14px}
+.pod-phrs{font-size:9px;color:var(--muted);white-space:nowrap}
+
+/* ===== تخصيص الشخصية ===== */
+.cz-open{margin-top:14px}
+/* شريط ثابت فوق (زر الحفظ يبقى ظاهر وأنت تنزل بين الملابس) */
+.cz-bar{position:sticky;top:0;z-index:20;background:var(--card);margin:-20px -20px 10px;padding:12px 20px 2px;
+  border-radius:20px 20px 0 0;box-shadow:0 6px 10px -8px rgba(0,0,0,.35)}
+.cz-top{display:flex;align-items:center;gap:10px;margin-bottom:6px}
+.cz-top h3{margin:0;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.cz-save{width:auto!important;margin:0;padding:9px 16px!important;font-size:14px!important;flex-shrink:0}
+.cz-bar .cz-msg{min-height:18px;margin:2px 0 6px}
+.cz-back{border:0;background:var(--line);color:var(--text);width:36px;height:36px;border-radius:50%;
+  font-size:18px;cursor:pointer;flex-shrink:0}
+.cz-stage{display:flex;justify-content:center;padding:14px;border-radius:16px;background:var(--line);margin-bottom:12px}
+.cz-stage canvas{image-rendering:pixelated;height:220px;width:auto;display:block}
+.cz-tabs{display:flex;gap:6px;overflow-x:auto;margin-bottom:6px;padding-bottom:4px}
+.cz-tab{flex:0 0 auto;border:0;padding:8px 14px;border-radius:999px;background:var(--line);color:var(--text);
+  font:inherit;font-size:13px;cursor:pointer}
+.cz-tab.active{background:var(--accent);color:var(--accent-text)}
+.cz-sec{font-size:12px;color:var(--muted);margin:14px 0 8px}
+.cz-grid{display:flex;flex-wrap:wrap;gap:8px}
+.cz-item{position:relative;border:2px solid transparent;border-radius:12px;background:var(--line);padding:2px;
+  cursor:pointer;line-height:0;font:inherit}
+.cz-item.sel{border-color:var(--accent)}
+.cz-item canvas{image-rendering:pixelated;display:block}
+.cz-item.locked canvas,.cz-item.locked .cz-dot{opacity:.4}
+.cz-lock{position:absolute;top:2px;inset-inline-end:3px;font-size:12px;line-height:1}
+.cz-item.cz-sw{padding:4px;border-radius:50%}
+.cz-dot{display:block;width:30px;height:30px;border-radius:50%;box-shadow:inset 0 0 0 1px rgba(0,0,0,.15)}
+.cz-msg{min-height:20px;text-align:center;font-size:13px;color:var(--muted);margin:12px 0 8px;font-weight:bold}
+
+/* ===== الاسم الذهبي اللماع + الشارات ===== */
+.gold-name{background:linear-gradient(100deg,#8a5a00 0%,#d99a10 28%,#f2b81c 45%,#ffe27a 52%,#e0a014 62%,#9a6500 100%);
+  background-size:220% 100%;-webkit-background-clip:text;background-clip:text;color:transparent!important;
+  -webkit-text-fill-color:transparent;animation:goldShine 3.2s linear infinite;font-weight:bold;filter:drop-shadow(0 0 .5px rgba(120,80,0,.55))}
+@keyframes goldShine{0%{background-position:120% 0}100%{background-position:-100% 0}}
+.pod-tag.gold-name{background:var(--card);-webkit-background-clip:border-box;background-clip:border-box}
+.pod-tag .gold-txt{background:linear-gradient(100deg,#8a5a00 0%,#d99a10 28%,#f2b81c 45%,#ffe27a 52%,#e0a014 62%,#9a6500 100%);
+  background-size:220% 100%;-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;
+  animation:goldShine 3.2s linear infinite}
+.bdg-row{display:inline-flex;align-items:center;gap:3px;flex-shrink:0;vertical-align:middle}
+.bdg{display:inline-block;line-height:0;flex-shrink:0;filter:drop-shadow(0 1px 1px rgba(0,0,0,.25))}
+.pod-tag .bdg-row{margin-inline-start:4px}
+.pod-tag{display:inline-flex;align-items:center;justify-content:center;gap:0}
+@media (prefers-reduced-motion:reduce){.gold-name,.pod-tag .gold-txt{animation:none}}
+
+/* ===== Market ===== */
+.mk-note{font-size:13px;color:var(--muted);line-height:1.6;margin-bottom:10px}
+.mk-bal{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;border-radius:14px;background:var(--line);margin-bottom:12px;font-weight:bold}
+.mk-stage{display:flex;justify-content:center;padding:12px;border-radius:16px;background:var(--line);margin-bottom:8px}
+.mk-stage canvas{image-rendering:pixelated;height:190px;width:auto;display:block}
+.mk-reset{display:block;margin:0 auto 6px;border:0;background:transparent;color:var(--muted);font:inherit;font-size:13px;cursor:pointer;text-decoration:underline}
+.mk-sec{font-size:13px;font-weight:bold;margin:16px 0 8px}
+.mk-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(92px,1fr));gap:8px}
+.mk-item{display:flex;flex-direction:column;align-items:center;gap:4px;padding:8px 4px 6px;border-radius:14px;background:var(--line);
+  border:2px solid transparent;cursor:pointer;font:inherit;color:var(--text);min-width:0}
+.mk-item.sel{border-color:var(--accent)}
+.mk-item canvas{image-rendering:pixelated;display:block}
+.mk-dot{display:block;width:34px;height:34px;border-radius:50%;box-shadow:inset 0 0 0 1px rgba(0,0,0,.15)}
+.mk-name{font-size:11px;text-align:center;line-height:1.3;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.mk-price{font-size:11px;font-weight:bold;padding:2px 8px;border-radius:999px;background:var(--card);white-space:nowrap}
+.mk-buy{border:0;border-radius:10px;padding:4px 10px;font:inherit;font-size:11px;background:var(--accent);color:var(--accent-text);opacity:.45;cursor:not-allowed}
+.mk-soon{text-align:center;font-size:12px;color:var(--muted);margin-top:14px}
+.pod-tag>span:first-child{overflow:hidden;text-overflow:ellipsis;min-width:0;unicode-bidi:plaintext}
+.pod-tag.me-gold{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent)}

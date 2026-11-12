@@ -8,7 +8,7 @@
 <style>
   body{font-family:Tahoma,sans-serif;max-width:520px;margin:20px auto;padding:0 14px;background:#111;color:#eee}
   h1{font-size:20px} label{display:block;margin:12px 0 4px}
-  input[type=number]{width:100%;padding:8px;border-radius:6px;border:1px solid #444;background:#1c1c1c;color:#eee}
+  input[type=number],input[type=time]{width:100%;padding:8px;border-radius:6px;border:1px solid #444;background:#1c1c1c;color:#eee}
   button{margin-top:12px;padding:10px 14px;border:0;border-radius:6px;background:#3b82f6;color:#fff;cursor:pointer;width:100%}
   button.red{background:#dc2626} .box{background:#1c1c1c;padding:14px;border-radius:10px;margin-top:16px}
   .row{display:flex;gap:10px;align-items:center} #msg{margin-top:10px;color:#fbbf24}
@@ -32,6 +32,14 @@
     <button onclick="createSessions()">إنشاء السشنات</button>
     <button class="red" onclick="stopAll()">إيقاف كل شي</button>
   </div>
+  <div class="box">
+    <b>🌙 إعدادات الإفطار (رمضان)</b>
+    <div class="row" style="margin-top:12px"><input type="checkbox" id="iftar_enabled"><label style="margin:0">تفعيل إيقاف السشنات وقت الإفطار</label></div>
+    <label>وقت الإفطار (بتوقيت بغداد، كل يوم)</label><input type="time" id="iftar_time" value="17:00">
+    <label>مدة التوقف (دقيقة)</label><input type="number" id="iftar_minutes" min="5" max="180" value="30">
+    <div class="hint">بوقت الإفطار يتوقف السشن الحالي تلقائياً وما تنشأ سشنات جديدة، وتنزل رسالة لكل الطلاب من فوق (اترك كل شي وروح افطر). بعد انتهاء المدة ترجع السشنات لحالتها (إذا التشغيل التلقائي كان مفعّل). أطفي الخيار بعد رمضان.</div>
+    <button onclick="saveIftar()">حفظ إعدادات الإفطار</button>
+  </div>
   <div class="box"><b>آخر السشنات</b><ul id="list"></ul></div>
 </div>
 <script>
@@ -50,6 +58,9 @@ async function init(){
 async function load(){
   const {data:s} = await sb.from('settings').select('*').eq('id',1).single();
   F.forEach(k => $(k).value = s[k]); $('auto_run').checked = s.auto_run;
+  $('iftar_enabled').checked = !!s.iftar_enabled;
+  if (s.iftar_time) $('iftar_time').value = String(s.iftar_time).slice(0,5);
+  if (s.iftar_minutes) $('iftar_minutes').value = s.iftar_minutes;
   const {data:rows} = await sb.from('sessions').select('starts_at,ends_at').order('starts_at',{ascending:false}).limit(6);
   $('list').innerHTML = (rows||[]).map(r => `<li>${new Date(r.starts_at).toLocaleString('ar-IQ')} ← ${new Date(r.ends_at).toLocaleTimeString('ar-IQ')}</li>`).join('');
 }
@@ -61,6 +72,13 @@ async function saveSettings(){
   }
   const {error} = await sb.from('settings').update(u).eq('id',1);
   msg(error ? 'خطأ: '+error.message : 'انحفظت الإعدادات ✅ (تنطبق على السشنات الجديدة)');
+}
+async function saveIftar(){
+  const t = $('iftar_time').value, m = +$('iftar_minutes').value;
+  if(!t){ msg('اكتب وقت الإفطار.'); return; }
+  if(!(m >= 5 && m <= 180)){ msg('مدة التوقف لازم تكون بين 5 و 180 دقيقة.'); return; }
+  const {error} = await sb.from('settings').update({iftar_enabled:$('iftar_enabled').checked, iftar_time:t+':00', iftar_minutes:m}).eq('id',1);
+  msg(error ? 'خطأ: '+error.message+' (إذا يقول العمود مو موجود، شغّل ramadan_setup.sql أول)' : 'انحفظت إعدادات الإفطار ✅');
 }
 async function createSessions(){
   const {error} = await sb.rpc('admin_create_sessions',{n:+$('count').value});

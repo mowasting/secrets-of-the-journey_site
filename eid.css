@@ -1,0 +1,53 @@
+/* eid.css : ألوان وشكل ثيم العيد (تشتغل فقط لما <html data-season="eid">)
+   تركوازي وذهبي مع رايات وقصاصات ملونة. */
+
+html[data-season="eid"]:root{
+  --bg:#d3ecf7; --card:#fffaf0; --text:#17405a; --muted:#6b8799; --line:#dcebf2;
+  --accent:#e0a020; --accent-text:#2b1b05; --logo-bg:#17405a; --logo-text:#ffd45a;
+  --shadow:0 12px 36px rgba(20,90,130,.22);
+}
+html[data-season="eid"][data-theme="dark"]:root{
+  --bg:#0b2b40; --card:#12405c; --text:#f6ecd2; --muted:#a9c4d3; --line:#1c5473;
+  --accent:#f2b632; --accent-text:#2b1b05; --logo-bg:#f2b632; --logo-text:#2b1b05;
+  --shadow:0 12px 36px rgba(0,0,0,.55);
+}
+html[data-season="eid"] body{padding-top:14px}
+
+html[data-season="eid"] .card{border:2px solid rgba(224,160,32,.55);border-radius:18px}
+html[data-season="eid"][data-theme="dark"] .card{border-color:rgba(242,182,50,.5)}
+
+html[data-season="eid"][data-theme="dark"] .tabbar{background:rgba(11,43,64,.96);color:#9fc0d0;border-top:2px solid rgba(242,182,50,.5)}
+html[data-season="eid"][data-theme="light"] .tabbar{background:rgba(255,250,240,.97);color:#5f7f92;border-top:2px solid rgba(224,160,32,.5)}
+html[data-season="eid"][data-theme="dark"] .tab-item.active{color:#ffd45a}
+html[data-season="eid"][data-theme="light"] .tab-item.active{color:#c4831a}
+html[data-season="eid"] .tab-item.active .tab-avatar{border-color:#f2b632}
+
+html[data-season="eid"] .seg-btn.active{background:#f2b632;color:#2b1b05}
+html[data-season="eid"] .mk-tab.on{background:#f2b632;color:#2b1b05;border-color:#f2b632}
+html[data-season="eid"] .mk-btn:not(.ghost):not(.on){background:#f2b632;color:#2b1b05}
+html[data-season="eid"] .mk-btn.on{background:#2fb3c9}
+html[data-season="eid"] .sj-lock-bar i{background:#f2b632}
+html[data-season="eid"] .credit-link{color:#e08a00 !important}
+html[data-season="eid"][data-theme="dark"] .credit-link{color:#ffd45a !important}
+html[data-season="eid"] .loader-bar span{background:linear-gradient(90deg,#f2b632,#2fb3c9)}
+
+/* ===== بطاقة السشن (الهيرو): مزرعة وخراف فوق ===== */
+html[data-season="eid"] .ed-card{overflow:hidden;padding-top:124px}
+.ed-hero{position:absolute;inset:0;width:100%;height:100%;z-index:0;image-rendering:pixelated;image-rendering:crisp-edges;pointer-events:none}
+html[data-season="eid"] .ed-card > :not(.ed-hero):not(.sound-bell):not(.ed-greet){position:relative;z-index:1}
+html[data-season="eid"] .ed-card .sound-bell{z-index:3}
+.ed-greet{position:absolute;top:14px;left:12px;z-index:3;padding:3px 12px;border-radius:999px;font-size:13px;font-weight:800;
+  color:#5a3300;background:linear-gradient(#ffe28a,#f2b632);border:2px solid #b8780a;box-shadow:0 2px 0 #b8780a;pointer-events:none}
+html[data-season="eid"] .ed-card .status-label,
+html[data-season="eid"] .ed-card .countdown{color:#fff;text-shadow:0 2px 0 rgba(10,50,80,.65),0 0 10px rgba(10,50,80,.6)}
+html[data-season="eid"] .ed-card .countdown{letter-spacing:1px}
+html[data-season="eid"][data-theme="light"] .ed-card .status-label,
+html[data-season="eid"][data-theme="light"] .ed-card .countdown{color:#0f3550;text-shadow:0 1px 0 rgba(255,255,255,.8),0 0 8px rgba(255,255,255,.7)}
+html[data-season="eid"] .ed-card #joinedInfo{color:#fff;text-shadow:0 1px 0 rgba(10,50,80,.8)}
+html[data-season="eid"][data-theme="light"] .ed-card #joinedInfo{color:#0f3550;text-shadow:0 1px 0 #fff}
+html[data-season="eid"] .ed-card #joinBtn{background:linear-gradient(#ffd45a,#f2b632);color:#2b1b05;border:3px solid #b8780a;border-radius:14px;box-shadow:0 4px 0 #b8780a;font-weight:800}
+
+/* ===== رايات أعلى الصفحة ===== */
+.ed-bunting{position:fixed;top:0;left:0;right:0;height:22px;z-index:48;pointer-events:none}
+.ed-bunting svg{width:100%;height:100%;display:block;filter:drop-shadow(0 1px 1px rgba(0,0,0,.25))}
+#edConfetti{position:fixed;inset:0;width:100%;height:100%;z-index:49;pointer-events:none}

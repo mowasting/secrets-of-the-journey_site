@@ -2,20 +2,21 @@
    -------------------------------------------------------------------
    "My tasks" page (bottom tab bar, right next to Account).
 
-   Three linked task lists, each with a real percentage:
+   Four linked task lists, each with a real percentage:
      - Session : tasks of the CURRENT session only (a new session = a fresh list)
+     - Day     : tasks of today (cleared every day at 12:00 AM, Baghdad time)
      - Week    : tasks of the current week (cleared every Sunday)
      - Month   : goals of the current month (cleared on the 1st of every month)
 
-   Linking:  session task -> weekly task -> monthly goal
+   Linking:  session task -> daily task -> weekly task -> monthly goal
    Progress: a task WITHOUT linked tasks is 0% or 100% (the student ticks it);
              a task WITH linked tasks gets its % from them (average), so
-             ticking session tasks automatically moves the weekly % and the
+             ticking session tasks automatically moves the daily, weekly and
              monthly % too.
 
    The data lives in the Supabase table  tasks  (each student sees only
-   his own rows - RLS). The reset days are decided by the database
-   (Baghdad time): sj_task_periods().
+   his own rows - RLS). The reset times are decided by the database
+   (Baghdad time): sj_task_periods_v2()  (see tasks_daily.sql).
 
    Needs in index.html:  #tasksView > #tasksRoot   #tabTasksLabel  (+ tasks.css)
    Needs from script.js: SJTasks.open() / setSession(id) / refreshLang()
@@ -27,13 +28,18 @@
   var STR = {
     ar: {
       tab: "مهامي",
+      day: "اليوم",
+      title_day: "تقدّمي اليوم",
+      note_day: "تنحذف كل يوم الساعة 12 منتصف الليل",
+      ph_day: "مهمة لليوم…",
+      link_day: "ربط بمهمة أسبوعية (اختياري)",
       session: "السشن", week: "الأسبوع", month: "الشهر",
       title_session: "تقدّمي بهذا السشن", title_week: "تقدّمي هذا الأسبوع", title_month: "تقدّمي هذا الشهر",
       note_session: "تبدأ فاضية مع كل سشن جديد",
       note_week: "تنحذف كل يوم أحد",
       note_month: "تنحذف كل أول يوم من الشهر",
       ph_session: "مهمة لهذا السشن…", ph_week: "مهمة لهذا الأسبوع…", ph_month: "هدف لهذا الشهر…",
-      link_session: "ربط بمهمة أسبوعية (اختياري)", link_week: "ربط بهدف شهري (اختياري)",
+      link_session: "ربط بمهمة يومية (اختياري)", link_week: "ربط بهدف شهري (اختياري)",
       add: "إضافة",
       empty: "ما في مهام بعد، أضف أول مهمة",
       noSession: "ما في سشن حالياً، انتظر السشن القادم لتضيف مهام",
@@ -48,13 +54,18 @@
     },
     en: {
       tab: "Tasks",
+      day: "Day",
+      title_day: "My progress today",
+      note_day: "Cleared every day at 12:00 AM (midnight)",
+      ph_day: "A task for today…",
+      link_day: "Link to a weekly task (optional)",
       session: "Session", week: "Week", month: "Month",
       title_session: "My progress this session", title_week: "My progress this week", title_month: "My progress this month",
       note_session: "Starts empty with every new session",
       note_week: "Cleared every Sunday",
       note_month: "Cleared on the 1st of every month",
       ph_session: "A task for this session…", ph_week: "A task for this week…", ph_month: "A goal for this month…",
-      link_session: "Link to a weekly task (optional)", link_week: "Link to a monthly goal (optional)",
+      link_session: "Link to a daily task (optional)", link_week: "Link to a monthly goal (optional)",
       add: "Add",
       empty: "No tasks yet, add your first one",
       noSession: "No session right now, wait for the next one to add tasks",
@@ -69,13 +80,18 @@
     },
     ckb: {
       tab: "ئەرکەکانم",
+      day: "ڕۆژ",
+      title_day: "پێشکەوتنم ئەمڕۆ",
+      note_day: "هەموو ڕۆژێک لە کاتژمێر ١٢ی شەو دەسڕدرێتەوە",
+      ph_day: "ئەرکێک بۆ ئەمڕۆ…",
+      link_day: "بیبەستەوە بە ئەرکێکی هەفتانە (ئارەزوومەندانە)",
       session: "سیشن", week: "هەفتە", month: "مانگ",
       title_session: "پێشکەوتنم لەم سیشنە", title_week: "پێشکەوتنم لەم هەفتەیە", title_month: "پێشکەوتنم لەم مانگە",
       note_session: "لەگەڵ هەر سیشنێکی نوێ بەتاڵ دەبێتەوە",
       note_week: "هەموو یەکشەممەیەک دەسڕدرێتەوە",
       note_month: "لە یەکەمی هەر مانگێک دەسڕدرێتەوە",
       ph_session: "ئەرکێک بۆ ئەم سیشنە…", ph_week: "ئەرکێک بۆ ئەم هەفتەیە…", ph_month: "ئامانجێک بۆ ئەم مانگە…",
-      link_session: "بیبەستەوە بە ئەرکێکی هەفتانە (ئارەزوومەندانە)", link_week: "بیبەستەوە بە ئامانجێکی مانگانە (ئارەزوومەندانە)",
+      link_session: "بیبەستەوە بە ئەرکێکی ڕۆژانە (ئارەزوومەندانە)", link_week: "بیبەستەوە بە ئامانجێکی مانگانە (ئارەزوومەندانە)",
       add: "زیادکردن",
       empty: "هێشتا ئەرکێک نییە، یەکەم ئەرک زیاد بکە",
       noSession: "ئێستا هیچ سیشنێک نییە، چاوەڕێی سیشنی داهاتوو بە بۆ زیادکردنی ئەرک",
@@ -90,8 +106,10 @@
     },
   };
 
-  var COLS = "id,kind,title,done,parent_id,session_id,week_start,month_start,created_at";
-  var SCOPES = ["session", "week", "month"];
+  var COLS = "id,kind,title,done,parent_id,session_id,day_start,week_start,month_start,created_at";
+  var SCOPES = ["session", "day", "week", "month"];
+  /* who a task can be linked to:  session -> day -> week -> month */
+  var PARENT = { session: "day", day: "week", week: "month" };
   var NS = "http://www.w3.org/2000/svg";
   var RING_C = 2 * Math.PI * 40;
   var CHECK_SVG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>';
@@ -111,6 +129,16 @@
   }
   function client() { return typeof supabaseClient !== "undefined" ? supabaseClient : null; }
 
+  /* today's date in Baghdad (YYYY-MM-DD): the day tab is cleared at 12:00 AM Baghdad time */
+  var dayFmt = null;
+  try {
+    dayFmt = new Intl.DateTimeFormat("en-CA", { timeZone: "Asia/Baghdad", year: "numeric", month: "2-digit", day: "2-digit" });
+  } catch (e) {}
+  function todayKey() {
+    try { if (dayFmt) return dayFmt.format(new Date()); } catch (e) {}
+    return new Date().toDateString();
+  }
+
   /* ---------- state ---------- */
   var root = null, tabLabel = null;
   var ui = { seg: {} };
@@ -125,8 +153,8 @@
     opened: false,
     adding: false,
     dayKey: "",
-    draft: { session: "", week: "", month: "" },
-    link: { session: "", week: "" },
+    draft: { session: "", day: "", week: "", month: "" },
+    link: { session: "", day: "", week: "" },
   };
 
   /* ---------- data helpers ---------- */
@@ -152,6 +180,7 @@
     return S.rows.filter(function (r) {
       if (r.kind !== scope) return false;
       if (scope === "month") return r.month_start === per.month_start;
+      if (scope === "day") return r.day_start === per.day_start;
       if (scope === "week") return r.week_start === per.week_start;
       return S.sessionId != null && String(r.session_id) === String(S.sessionId);
     });
@@ -169,9 +198,9 @@
     var c = client();
     if (!c) return Promise.resolve();
     if (S.loading) return S.loading;
-    S.dayKey = new Date().toDateString();
+    S.dayKey = todayKey();
     S.loading = Promise.all([
-      c.rpc("sj_task_periods"),
+      c.rpc("sj_task_periods_v2"),
       c.from("tasks").select(COLS).order("created_at", { ascending: true }),
     ]).then(function (res) {
       var p = res[0], r = res[1];
@@ -346,7 +375,7 @@
     ui.input.disabled = locked;
     ui.addBtn.textContent = tr("add");
     ui.addBtn.disabled = locked || !S.loaded || S.adding;
-    var parentScope = sc === "session" ? "week" : sc === "week" ? "month" : null;
+    var parentScope = PARENT[sc] || null;
     ui.link.hidden = !parentScope;
     if (!parentScope) return;
     ui.link.replaceChildren();
@@ -447,8 +476,8 @@
   /* called by script.js every second with the id of the current / next session */
   function setSession(id) {
     id = id == null ? null : String(id);
-    // the page stayed open across midnight: ask the database for the new week / month
-    if (S.opened && S.dayKey && !S.loading && new Date().toDateString() !== S.dayKey) load();
+    // the page stayed open across midnight (Baghdad): ask the database for the new day / week / month
+    if (S.opened && S.dayKey && !S.loading && todayKey() !== S.dayKey) load();
     if (id === S.sessionId) return;
     S.sessionId = id;
     renderAll();
