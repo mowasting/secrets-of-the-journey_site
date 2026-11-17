@@ -18,8 +18,15 @@ let myFlair = { is_gold: false, equipped: [] };
 const UNLOCK_HOURS = { forest: 50, tasks: 50, youtube: 70 };
 const UNLOCK_BYPASS = false;   // true = يفتح كلشي للتجربة فقط
 let myStudySecs = 0, hoursLoaded = false, hoursTimer = null;
+let unlockAll = false;   // يتفعّل من قاعدة البيانات لحسابات معيّنة فقط (عمود users.unlock_all)
+async function loadUnlockAll() {
+  try {
+    const { data, error } = await supabaseClient.rpc("my_unlock_all");
+    unlockAll = !error && data === true;
+  } catch (e) { unlockAll = false; }
+}
 function featureUnlocked(name) {
-  if (UNLOCK_BYPASS) return true;
+  if (UNLOCK_BYPASS || unlockAll) return true;
   return hoursLoaded && myStudySecs >= (UNLOCK_HOURS[name] || 0) * 3600;
 }
 
@@ -654,6 +661,7 @@ async function enterApp() {
   $("adminLink").hidden = !isAdmin;
 
   await loadSession();
+  await loadUnlockAll();
   applyLocks();
   refreshHours();
   clearInterval(hoursTimer);
