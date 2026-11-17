@@ -14,6 +14,15 @@
   .row{display:flex;gap:10px;align-items:center} #msg{margin-top:10px;color:#fbbf24}
   li{margin:4px 0;font-size:14px}
   .hint{font-size:12px;color:#9ca3af;margin-top:4px;line-height:1.6}
+  input[type=text]{width:100%;padding:8px;border-radius:6px;border:1px solid #444;background:#1c1c1c;color:#eee;box-sizing:border-box}
+  #gItems{max-height:240px;overflow:auto;border:1px solid #333;border-radius:8px;margin-top:8px;padding:4px}
+  #gItems label{display:flex;gap:8px;align-items:center;margin:0;padding:6px;border-radius:6px;font-size:14px;cursor:pointer}
+  #gItems label:hover{background:#262626}
+  #gItems .k{margin-inline-start:auto;font-size:11px;color:#9ca3af;direction:ltr}
+  #gChips{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+  .chip{background:#1e3a8a;border-radius:999px;padding:3px 10px;font-size:13px;cursor:pointer}
+  #gRes{white-space:pre-wrap;background:#0d0d0d;border-radius:8px;padding:10px;font-size:13px;margin-top:10px;display:none;line-height:1.7}
+  button.green{background:#16a34a}
 </style>
 </head>
 <body>
@@ -40,6 +49,20 @@
     <div class="hint">بوقت الإفطار يتوقف السشن الحالي تلقائياً وما تنشأ سشنات جديدة، وتنزل رسالة لكل الطلاب من فوق (اترك كل شي وروح افطر). بعد انتهاء المدة ترجع السشنات لحالتها (إذا التشغيل التلقائي كان مفعّل). أطفي الخيار بعد رمضان.</div>
     <button onclick="saveIftar()">حفظ إعدادات الإفطار</button>
   </div>
+  <div class="box">
+    <b>🎁 إعطاء ايتم لطالب</b>
+    <div class="hint">يعطي الايتم ويرسل له رسالة الجائزة بالتيليجرام تلقائياً.</div>
+    <label>ايدي التيليجرام</label>
+    <input type="text" id="gTg" inputmode="numeric" placeholder="مثال: 7949153338" dir="ltr">
+    <label>دوّر على الايتم</label>
+    <input type="text" id="gSearch" placeholder="اسم الايتم أو الكود..." oninput="renderItems()">
+    <div id="gItems"><div class="hint" style="padding:8px">جاري التحميل...</div></div>
+    <div id="gChips"></div>
+    <div class="row" style="margin-top:12px"><input type="checkbox" id="gNotify" checked><label style="margin:0">ارسل رسالة التيليجرام</label></div>
+    <button class="green" id="gBtn" onclick="sendGift()">🎁 إعطاء</button>
+    <div id="gRes"></div>
+    <div style="margin-top:14px"><b style="font-size:14px">آخر الجوائز</b><ul id="gRecent"></ul></div>
+  </div>
   <div class="box"><b>آخر السشنات</b><ul id="list"></ul></div>
 </div>
 <script>
@@ -53,7 +76,7 @@ async function init(){
   if(!session){ msg('سجّل دخول من الموقع أول، بعدين ارجع لهالصفحة.'); return; }
   const {data:ok} = await sb.rpc('sj_is_admin');
   if(!ok){ msg('هذا الحساب مو أدمن.'); return; }
-  $('panel').style.display='block'; load();
+  $('panel').style.display='block'; load(); loadGiftItems(); loadRecent();
 }
 async function load(){
   const {data:s} = await sb.from('settings').select('*').eq('id',1).single();
@@ -89,6 +112,58 @@ async function stopAll(){
   const {error} = await sb.rpc('admin_stop_all');
   msg(error ? 'خطأ: '+error.message : 'انوقف كل شي ✅'); load();
 }
+/* ===== 🎁 إعطاء ايتم ===== */
+let gAll = [], gSel = new Set();
+const esc = t => String(t==null?'':t).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const gName = k => { const it = gAll.find(x => x.key === k); return it ? (it.ar || k) : k; };
+async function loadGiftItems(){
+  const {data,error} = await sb.rpc('admin_list_items');
+  if(error){
+    $('gItems').innerHTML = '<div class="hint" style="padding:8px;color:#fbbf24">خطأ: '+esc(error.message)+' — شغّل admin_gift_setup.sql مرة وحدة بـ Supabase أول.</div>';
+    return;
+  }
+  gAll = Array.isArray(data) ? data : [];
+  renderItems();
+}
+function renderItems(){
+  const q = $('gSearch').value.trim().toLowerCase();
+  const list = gAll.filter(x => !q || (x.key||'').toLowerCase().includes(q) || (x.ar||'').toLowerCase().includes(q));
+  $('gItems').innerHTML = list.length ? list.map(x =>
+    `<label><input type="checkbox" data-k="${esc(x.key)}" ${gSel.has(x.key)?'checked':''} onchange="toggleItem(this)"><span>${esc(x.ar||x.key)}</span><span class="k">${esc(x.key)}${x.price!=null?' · '+esc(x.price):''}</span></label>`
+  ).join('') : '<div class="hint" style="padding:8px">ما لقيت شي.</div>';
+}
+function toggleItem(el){
+  const k = el.dataset.k;
+  el.checked ? gSel.add(k) : gSel.delete(k);
+  renderChips();
+}
+function renderChips(){
+  $('gChips').innerHTML = [...gSel].map(k => `<span class="chip" data-k="${esc(k)}" onclick="dropChip(this)">${esc(gName(k))} ✕</span>`).join('');
+}
+function dropChip(el){ gSel.delete(el.dataset.k); renderChips(); renderItems(); }
+async function sendGift(){
+  const tg = $('gTg').value.trim();
+  if(!/^\d{5,15}$/.test(tg)){ msg('اكتب ايدي التيليجرام (أرقام فقط).'); return; }
+  if(!gSel.size){ msg('اختر ايتم واحد على الأقل.'); return; }
+  const names = [...gSel].map(gName).join('، ');
+  if(!confirm('اعطي ('+names+') للايدي '+tg+' ؟')) return;
+  $('gBtn').disabled = true;
+  const {data,error} = await sb.rpc('admin_gift_item',{p_tg:tg, p_items:[...gSel].join(','), p_notify:$('gNotify').checked});
+  $('gBtn').disabled = false;
+  const r = $('gRes'); r.style.display = 'block';
+  if(error){ r.textContent = '❌ '+error.message; msg('فشل الإعطاء.'); }
+  else { r.textContent = data; msg('تمت العملية، شوف النتيجة تحت.'); gSel.clear(); renderChips(); renderItems(); }
+  loadRecent();
+}
+async function loadRecent(){
+  const {data,error} = await sb.rpc('admin_recent_gifts');
+  if(error){ $('gRecent').innerHTML=''; return; }
+  $('gRecent').innerHTML = (data||[]).map(g => {
+    const t = g.sent_at ? new Date(g.sent_at).toLocaleString('ar-IQ') : '⏳ بالانتظار';
+    return `<li>${esc(g.telegram_id)} — ${esc(g.prize)} <span class="hint">(${t}${g.error?' · ⚠️ '+esc(g.error):''})</span></li>`;
+  }).join('');
+}
+
 init();
 </script>
 </body>
